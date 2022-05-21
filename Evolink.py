@@ -90,8 +90,8 @@ def create_permuation_matrix(list1,list2):
         matrix[idx1,idx2] = 1
     return matrix
 
-def pipeline(args):
 
+def pipeline(args):
 
     gene_table = args.gene_table
     trait_table = args.trait_table
@@ -118,25 +118,32 @@ def pipeline(args):
     else:
         raise ValueError("dimmension of genotype file do not match that of trait file")
 
-    # function : gene_species_list, species_list, T1_index, T0_index, gene_matrix, trait_matrix, tree_file,gene_list
-    permutation_test = 10
-    count = 0
-    while count < permutation_test:
-        species_list_sim = np.random.permutation(species_list).tolist()
-        df_sim = Evolink_calculation(species_list_sim,gene_species_list,gene_list,T1_index,T0_index, gene_matrix,trait_matrix,tree_file)
-        df_sim["Evolink_index"].to_csv(output+str(count),sep="\t")
-        count += 1
+
+    from multiprocessing import Pool
+    from functools import partial
+
+    # CREATE Permutation times
+    permutation_times = 10
+
+    simfun=partial( Evolink_calculation,
+            gene_species_list=gene_species_list,
+            gene_list=gene_list,
+            T1_index=T1_index,
+            T0_index=T0_index,
+            gene_matrix=gene_matrix,
+            trait_matrix=trait_matrix,
+            tree_file=tree_file)
+
+    if permutation_times:
+        with Pool() as pool:
+            sim_list_arr = pool.map(simfun, [np.random.permutation(species_list).tolist() for i in range(permutation_times)])
+            sim_res= np.stack(sim_list_arr,axis=0)
+            print(sim_res.shape)
 
 
-    # species_list_sim = np.random.permutation(species_list)
-    # Each permutation change the species_list order 
-    
     df = Evolink_calculation(species_list,gene_species_list,gene_list,T1_index,T0_index, gene_matrix,trait_matrix,tree_file)
-
     df.to_csv(output, sep="\t")
 
-    # clear intermediate files
-    #shutil.rmtree(dirpath)
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
