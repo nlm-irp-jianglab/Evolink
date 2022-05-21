@@ -118,14 +118,14 @@ def pipeline(args):
     else:
         raise ValueError("dimmension of genotype file do not match that of trait file")
 
-
-    from multiprocessing import Pool
-    from functools import partial
-
     # CREATE Permutation times
     permutation_times = 10
 
-    simfun=partial( Evolink_calculation,
+    if permutation_times:
+        from multiprocessing import Pool
+        from functools import partial
+
+        simfun=partial( Evolink_calculation,
             gene_species_list=gene_species_list,
             gene_list=gene_list,
             T1_index=T1_index,
@@ -134,7 +134,6 @@ def pipeline(args):
             trait_matrix=trait_matrix,
             tree_file=tree_file)
 
-    if permutation_times:
         with Pool() as pool:
             sim_list_arr = pool.map(simfun, [np.random.permutation(species_list).tolist() for i in range(permutation_times)])
             sim_res= np.stack(sim_list_arr,axis=0)
