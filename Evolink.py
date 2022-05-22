@@ -140,12 +140,12 @@ def pipeline(args):
             sim_list_arr = pool.map(simfun, [np.random.permutation(species_list).tolist() for i in range(permutation_times)])
             sim_res= np.stack(sim_list_arr,axis=0)[:,:,7].T
 
-    evolink_value =df["Evolink_index"].values
-    repeats_array = np.transpose([evolink_value] * permutation_times)
-    more_ct=100*np.sum(np.less(repeats_array,sim_res),axis=1)/permutation_times
-    less_ct=100*np.sum(np.less(sim_res,repeats_array),axis=1)/permutation_times
-    df["higher_perc"] = less_ct
-    df["lower_perc"] = more_ct
+        evolink_value =df["Evolink_index"].values
+        repeats_array = np.transpose([evolink_value] * permutation_times)
+        more_ct=100*np.sum(np.less(repeats_array,sim_res),axis=1)/permutation_times
+        less_ct=100*np.sum(np.less(sim_res,repeats_array),axis=1)/permutation_times
+        df["higher_perc"] = less_ct
+        df["lower_perc"] = more_ct
 
     df.to_csv(output, sep="\t")
 
