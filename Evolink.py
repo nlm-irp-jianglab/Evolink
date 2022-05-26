@@ -4,7 +4,7 @@
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
-import os, tempfile
+import os, tempfile, datetime
 
 def Evolink_calculation(trait_matrix, species_list, gene_species_list, gene_list, gene_matrix, tree_file):
 
@@ -137,13 +137,13 @@ def pipeline(args):
     output = args.output
 
     ### Read trait data ###
-    print("Read trait data")
+    print("[",datetime.datetime.now(),"]","Read trait data")
     trait_df = pd.read_csv(trait_table, sep='\t',index_col=0)
     species_list = trait_df.index.values.tolist()
     trait_matrix = np.ravel(trait_df.values)
 
     ### Read gene data ###
-    print("Read gene data")
+    print("[",datetime.datetime.now(),"]","Read gene data")
     gene_df = pd.read_csv(gene_table, sep='\t',index_col=0)
     if CN:
         gene_df.values = np.where(gene_df.values > 0, 1, 0)
@@ -160,7 +160,7 @@ def pipeline(args):
     ### Perform permutation test ###
     perm_done = 0
     if permutation_times > 0:
-        print("Perform permutation test")
+        print("[",datetime.datetime.now(),"]","Perform permutation test")
         from multiprocessing import Pool
         from functools import partial
 
@@ -179,7 +179,7 @@ def pipeline(args):
             perm_trait_mat = columnData.values
             trait_matrix_input.append(perm_trait_mat)
 
-        print("Multiprocess simulate", permutation_times, "times")
+        print("[",datetime.datetime.now(),"]","Multiprocess simulate", permutation_times, "times")
         with Pool(processes=threads) as pool:
             # tqdm is used to show progress bar
             sim_list_arr = list(tqdm(pool.imap_unordered(simfun, trait_matrix_input), total=len(trait_matrix_input)))
@@ -188,7 +188,7 @@ def pipeline(args):
         pool.join()
         perm_done = 1
 
-    print("Calculate Evolink index")
+    print("[",datetime.datetime.now(),"]","Calculate Evolink index")
     df = Evolink_calculation(trait_matrix, species_list, gene_species_list, gene_list,
                              gene_matrix, tree_file)
 
@@ -200,7 +200,7 @@ def pipeline(args):
         df["higher_pval"] = higher_pval
         df["lower_pval"] = lower_pval
 
-    print("Output result")
+    print("[",datetime.datetime.now(),"]","Output result")
     df.to_csv(output, sep="\t", na_rep='NaN')
 
 if __name__ == "__main__":
