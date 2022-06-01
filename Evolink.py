@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from tqdm import tqdm
 import pandas as pd
 import numpy as np
 import os, tempfile, datetime
 import rpy2.robjects as robjects
+from tqdm import tqdm
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.conversion import localconverter
+from unifrac import faith_pd
+from biom.util import biom_open
+from biom.table import Table
 
 def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree_file):
 
@@ -40,14 +45,11 @@ def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree
     return df
 
 def matrix2hdf5(mat, row_names, col_names, outfile):
-    from biom.util import biom_open
-    from biom.table import Table
     mat = Table(mat, row_names, col_names)
     with biom_open(outfile, 'w') as f:
         mat.to_hdf5(f, "Evolink")
 
 def matrix_faith_pd( matrix, species_name, gene_list, tree_path):
-    from unifrac import faith_pd
     fd, path = tempfile.mkstemp(suffix=".biom")
     matrix2hdf5(matrix, species_name, gene_list, path)
     obs = faith_pd(path,tree_path)
@@ -89,8 +91,6 @@ def generate_tree(tree_file, species_sub):
     return (path, br_len)
 
 def simulate_phen(tree_file, phen_file, perm_times, seed=1):
-    from rpy2.robjects import pandas2ri
-    from rpy2.robjects.conversion import localconverter
 
     rcode = '''
     suppressPackageStartupMessages(library(geiger))
