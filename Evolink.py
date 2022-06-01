@@ -5,12 +5,12 @@ import pandas as pd
 import numpy as np
 import os, tempfile, datetime
 import rpy2.robjects as robjects
-from tqdm import tqdm
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
 from unifrac import faith_pd
 from biom.util import biom_open
 from biom.table import Table
+from tqdm import tqdm
 
 def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree_file):
 
