@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from re import X
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
