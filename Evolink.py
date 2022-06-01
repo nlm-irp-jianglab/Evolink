@@ -5,23 +5,22 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 import os, tempfile, datetime
+import rpy2.robjects as robjects
 
-def Evolink_calculation(trait_matrix, species_list, gene_species_list, gene_list, gene_matrix, tree_file):
+def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree_file):
 
-    T1_index = np.where(trait_matrix == 1)[0]
-    T0_index = np.where(trait_matrix == 0)[0]
+    T1_index, T0_index, G1T1, G0T1, G1T0, G0T0 = generate_four_matrix(gene_matrix, trait_matrix)
+
     T1_species = [species_list[i] for i in T1_index]
     T0_species = [species_list[i] for i in T0_index]
-
-    G1T1, G0T1, G1T0, G0T0 = compute_four_matrix(gene_species_list, species_list,T1_species,T0_species, gene_matrix, trait_matrix)
-
     T1_path, T1_len = generate_tree(tree_file,T1_species)
     T0_path, T0_len = generate_tree(tree_file,T0_species)
 
-    G1T1_obs = matrix_faith_pd(G1T1,T1_species,gene_list,T1_path)
-    G0T1_obs = matrix_faith_pd(G0T1,T1_species,gene_list,T1_path)
-    G1T0_obs = matrix_faith_pd(G1T0,T0_species,gene_list,T0_path)
-    G0T0_obs = matrix_faith_pd(G0T0,T0_species,gene_list,T0_path)
+    G1T1_obs = matrix_faith_pd(G1T1, T1_species, gene_list, T1_path)
+    G0T1_obs = matrix_faith_pd(G0T1, T1_species, gene_list, T1_path)
+    G1T0_obs = matrix_faith_pd(G1T0, T0_species, gene_list, T0_path)
+    G0T0_obs = matrix_faith_pd(G0T0, T0_species, gene_list, T0_path)
+    # delete temp tree files
     os.unlink(T1_path)
     os.unlink(T0_path)
 
@@ -38,68 +37,64 @@ def Evolink_calculation(trait_matrix, species_list, gene_species_list, gene_list
 
     result = np.vstack((Prevalence_index, Evolink_index)).T
     df = pd.DataFrame(result, columns=["Prevalence_index", "Evolink_index"], index=gene_list)
-
     return df
 
-def matrix_faith_pd( matrix, species_name, gene_list,tree_path):
+def matrix2hdf5(mat, row_names, col_names, outfile):
+    from biom.util import biom_open
+    from biom.table import Table
+    mat = Table(mat, row_names, col_names)
+    with biom_open(outfile, 'w') as f:
+        mat.to_hdf5(f, "Evolink")
+
+def matrix_faith_pd( matrix, species_name, gene_list, tree_path):
     from unifrac import faith_pd
     fd, path = tempfile.mkstemp(suffix=".biom")
     matrix2hdf5(matrix, species_name, gene_list, path)
     obs = faith_pd(path,tree_path)
     os.close(fd)
+    # delete temp biom files
     os.unlink(path)
     return obs
 
-def compute_four_matrix(gene_species_list, species_list, T1_species,T0_species, gene_matrix, trait_matrix):
-    gene_perm_matrix = create_permuation_matrix(gene_species_list,species_list)
-    T1_perm_matrix = create_permuation_matrix(species_list,T1_species)
-    T0_perm_matrix = create_permuation_matrix(species_list,T0_species)
+def generate_four_matrix(gene_matrix, trait_matrix):
+    T1_index = np.where(trait_matrix == [1])[0]
+    T0_index = np.where(trait_matrix == [0])[0]
+    G1T1 = np.multiply(gene_matrix,np.transpose(trait_matrix)).T[T1_index]
+    G0T1 = np.multiply(1-gene_matrix,np.transpose(trait_matrix)).T[T1_index]
+    G1T0 = np.multiply(gene_matrix,np.transpose(1-trait_matrix)).T[T0_index]
+    G0T0 = np.multiply(1-gene_matrix,np.transpose(1-trait_matrix)).T[T0_index]
+    return (T1_index, T0_index, G1T1, G0T1, G1T0, G0T0)
 
-    gene_matrix_perm = gene_matrix @ gene_perm_matrix
+def sum_br_len(tree_file):
+    res = robjects.r('''
+    library(ape)
+    tree = read.tree("'''+tree_file+'''")
+    sum(tree$edge.length)
+    ''')
+    br_len_sum = res[0]
+    return br_len_sum
 
-    G1T1 =( gene_matrix_perm     * trait_matrix       @ T1_perm_matrix).T 
-    G0T1 =( (1-gene_matrix_perm) * trait_matrix       @ T1_perm_matrix).T 
-    G1T0 =( gene_matrix_perm     * (1-trait_matrix)   @ T0_perm_matrix).T 
-    G0T0 =( (1-gene_matrix_perm) * (1-trait_matrix)   @ T0_perm_matrix).T 
-
-    return (G1T1, G0T1, G1T0, G0T0)
-
-def generate_tree(tree_file,species_sub):
-    from ete3 import Tree
-    in_tree = Tree(tree_file,format=1)
-    in_tree.prune(species_sub, preserve_branch_length = True)
-    br_len = sum_br_len(in_tree)
+def generate_tree(tree_file, species_sub):
     fd, path = tempfile.mkstemp(suffix=".nwk")
-    in_tree.write(format=1,outfile=path,format_root_node=True)
+    species = robjects.vectors.StrVector(species_sub)
+    robjects.globalenv['species'] = species
+    robjects.r('''
+    library(ape)
+    tree = read.tree("'''+tree_file+'''")
+    pruned.tree<-drop.tip(tree, setdiff(tree$tip.label, species));
+    write.tree(pruned.tree, "'''+path+'''")
+    ''')
+    br_len = sum_br_len(path)
+    os.close(fd)
     return (path, br_len)
 
-def sum_br_len(tree):
-    return sum([node.dist for node in tree.traverse() if not node.is_root()])
-
-def matrix2hdf5(mat, row_names, col_names, outfile):
-    from biom.util import biom_open
-    from biom.table import Table
-
-    mat = Table(mat, row_names, col_names)
-    with biom_open(outfile, 'w') as f:
-        mat.to_hdf5(f, "Evolink")
-
-def create_permuation_matrix(list1, list2):
-    matrix= np.zeros((len(list1), len(list2)))
-    for element in list2:
-        idx1 = list1.index(element)
-        idx2 = list2.index(element)
-        matrix[idx1,idx2] = 1
-    return matrix
-
-def simulate_phen(tree_file, phen_file, perm_times):
-    import rpy2.robjects as robjects
-    from rpy2.robjects.packages import importr
+def simulate_phen(tree_file, phen_file, perm_times, seed=1):
     from rpy2.robjects import pandas2ri
     from rpy2.robjects.conversion import localconverter
 
     rcode = '''
     suppressPackageStartupMessages(library(geiger))
+    set.seed('''+str(seed)+''')
     cn2bi<-function(x, n){
         cutoff=sort(x, decreasing = TRUE)[n]
         return(as.integer(x >= cutoff))
@@ -118,7 +113,6 @@ def simulate_phen(tree_file, phen_file, perm_times):
     phen=read.table("'''+phen_file+'''", header=T, row.names=1)
     sim_data = simTrait(tree, phen, perm_times='''+str(perm_times)+''')
     '''
-
     sim_data = robjects.r(rcode)
 
     with localconverter(robjects.default_converter + pandas2ri.converter):
@@ -133,73 +127,111 @@ def pipeline(args):
     tree_file = args.tree_file
     CN = args.CN
     permutation_times = args.permutation_times
+    # all_threads = args.threads
     threads = args.threads
+    seed = args.seed
+    threshold = args.threshold
+    alpha = args.alpha
     output = args.output
+
+    # ### Set theads ###
+    # if all_threads <= 4:
+    #     faith_pd_threads = all_threads - 1
+    # elif 4 < all_threads <= 8:
+    #     faith_pd_threads = 4
+    # else:
+    #     faith_pd_threads = 8
+    # threads = all_threads - faith_pd_threads
+    # os.putenv("OMP_NUM_THREADS", str(faith_pd_threads))
+    # print(faith_pd_threads, threads)
 
     ### Read trait data ###
     print("[",datetime.datetime.now(),"]","Read trait data")
     trait_df = pd.read_csv(trait_table, sep='\t',index_col=0)
-    species_list = trait_df.index.values.tolist()
-    trait_matrix = np.ravel(trait_df.values)
+    species_list = trait_df.index.values
+    trait_matrix = trait_df.values
 
     ### Read gene data ###
     print("[",datetime.datetime.now(),"]","Read gene data")
     gene_df = pd.read_csv(gene_table, sep='\t',index_col=0)
+    gene_df = gene_df[species_list]
     if CN:
         gene_df.values = np.where(gene_df.values > 0, 1, 0)
     gene_list = gene_df.index.values
-    gene_species_list = gene_df.columns.values.tolist()
+    gene_species_list = gene_df.columns.values
     gene_matrix = gene_df.values
 
     # test if the species in gene_table is the same to those in trait list
     if set(gene_species_list) == set(species_list):
         pass
     else:
-        raise ValueError("dimmension of genotype file do not match that of trait file")
+        raise ValueError("Dimmension of genotype file do not match that of trait file")
+
+    ### Calculate Evolink index ###
+    print("[",datetime.datetime.now(),"]","Calculate Evolink index")
+    df = Evolink_calculation(trait_matrix, gene_matrix, 
+                             species_list, gene_list, tree_file)
 
     ### Perform permutation test ###
-    perm_done = 0
     if permutation_times > 0:
-        print("[",datetime.datetime.now(),"]","Perform permutation test")
-        from multiprocessing import Pool
+        # default labels for all genes
+        df["label"] = "ns"
+        df["higher_pval"] = np.nan
+        df["lower_pval"] = np.nan
+        df["higher_pval.adj"] = np.nan
+        df["lower_pval.adj"] = np.nan
+
+        print("[",datetime.datetime.now(),"]","Filter genes with", threshold, "%")
+        df['Evolink_index.abs'] = df['Evolink_index'].abs()
+        # top threshold % fraction genes of abs(Evolink_index)
+        kept_genes = df.nlargest(int(len(df)*threshold),'Evolink_index.abs').index
+        kept_gene_df = gene_df.loc[kept_genes]
+        kept_genes_matrix = kept_gene_df.values
+        kept_gene_list = kept_gene_df.index.values
+        print("Keep", kept_gene_df.shape[0],"/",df.shape[0], "genes")
+
+        from multiprocessing import get_context
         from functools import partial
+        import statsmodels.stats.multitest as smm
+
+        print("[",datetime.datetime.now(),"]","Perform permutation test")
 
         simfun=partial( Evolink_calculation,
+            gene_matrix = kept_genes_matrix,
             species_list = species_list,
-            gene_species_list=gene_species_list,
-            gene_list=gene_list,
-            gene_matrix=gene_matrix,
-            tree_file=tree_file)
+            gene_list = kept_gene_list,
+            tree_file = tree_file)
 
-        perm_df = simulate_phen(tree_file, trait_table, permutation_times)
+        perm_df = simulate_phen(tree_file, trait_table, permutation_times, seed)
 
+        print("[",datetime.datetime.now(),"]","Simulate", permutation_times, "times")
         trait_matrix_input = []
         perm_df = perm_df.reindex(species_list)
         for (columnName, columnData) in perm_df.iteritems():
             perm_trait_mat = columnData.values
             trait_matrix_input.append(perm_trait_mat)
 
-        print("[",datetime.datetime.now(),"]","Multiprocess simulate", permutation_times, "times")
-        with Pool(processes=threads) as pool:
+        # get_context("spawn") might solve the occupation of multiprocesses called by faith_pd in the unifrac module
+        with get_context("spawn").Pool(processes=threads) as pool:
             # tqdm is used to show progress bar
             sim_list_arr = list(tqdm(pool.imap_unordered(simfun, trait_matrix_input), total=len(trait_matrix_input)))
-            sim_res= np.stack(sim_list_arr,axis=0)[:,:,1].T
-        pool.close()
-        pool.join()
-        perm_done = 1
+            pool.close()
+            pool.join()
+        sim_res= np.stack(sim_list_arr,axis=0)[:,:,1].T
 
-    print("[",datetime.datetime.now(),"]","Calculate Evolink index")
-    df = Evolink_calculation(trait_matrix, species_list, gene_species_list, gene_list,
-                             gene_matrix, tree_file)
-
-    evolink_value = df["Evolink_index"].values
-    if perm_done:
+        evolink_value = df.loc[kept_genes, "Evolink_index"].values
         repeats_array = np.transpose([evolink_value] * permutation_times) # an array of len(evolink_value)*permutation_times length
+        
         lower_pval = (np.sum(np.less(repeats_array, sim_res),axis=1)+1)/(permutation_times+1)
         higher_pval = (np.sum(np.greater(repeats_array, sim_res),axis=1)+1)/(permutation_times+1)
-        df["higher_pval"] = higher_pval
-        df["lower_pval"] = lower_pval
+        
+        df.loc[kept_genes, "higher_pval"] = higher_pval
+        df.loc[kept_genes, "lower_pval"] = lower_pval
+        df.loc[kept_genes, "higher_pval.adj"] = smm.multipletests(df.loc[kept_genes, "higher_pval"].values, method="fdr_bh")[1]
+        df.loc[kept_genes, "lower_pval.adj"] = smm.multipletests(df.loc[kept_genes, "lower_pval"].values, method="fdr_bh")[1]
+        df.loc[((df["lower_pval"] < 0.05) & (df["lower_pval.adj"] < alpha)) | (df["higher_pval"] < 0.05) & (df["higher_pval.adj"] < alpha), "label"] = "sig"
 
+    ### Output ###
     print("[",datetime.datetime.now(),"]","Output result")
     df.to_csv(output, sep="\t", na_rep='NaN')
 
@@ -211,17 +243,20 @@ if __name__ == "__main__":
     '[With non-binary gene table] python Evolink.py -g test/gene_CN.tsv -c -t test/trait.tsv -n test/tree.nwk -o test_res.tsv.')
     
     # Essential Input
-    parser.add_argument('-g', '--gene', help='Tab-delimited gene presence/absence or copy number table. Columns are gene families, while rows are tip names/species/genomes in the phylogenetic tree. If copy number table is provided, please use -c option so that it will be internally converted to binary table. Presence=1, Absence=0.', required=True, dest='gene_table', metavar='FILE_PATH')
-    parser.add_argument('-t', '--trait', help='Two-column (so far only one trait a time) tab-delimited trait presence/absence table. The first column is tip names and the second column is the presence/absence of this trait on the tips/species/genomes. Presence=1, Absence=0.',required=True, dest='trait_table', metavar='FILE_PATH')
-    parser.add_argument('-n', '--phylogeny', help='A phylogentic tree in newick format. The tip names should be the same in the gene table and trait table.',required=True, dest='tree_file', metavar='FILE_PATH')
+    parser.add_argument('-g', '--genotype', help='Tab-delimited gene presence/absence or copy number table. Columns are gene families, while rows are tip names/species/genomes in the phylogenetic tree. If copy number table is provided, please use -c option so that it will be internally converted to binary table. Presence=1, Absence=0.', required=True, dest='gene_table', metavar='GENE_TABLE')
+    parser.add_argument('-t', '--phenotype', help='Two-column (so far only one trait is allowed each time) tab-delimited trait presence/absence table. The first column is tip names and the second column is the presence/absence of this trait on the tips/species/genomes. Presence=1, Absence=0.',required=True, dest='trait_table', metavar='TRAIT_TABLE')
+    parser.add_argument('-n', '--phylogeny', help='A phylogentic tree in newick format. The tip names should be the same in the gene table and trait table.',required=True, dest='tree_file', metavar='TREE')
 
     # Optional Input
     parser.add_argument('-c', '--copy_number', help='The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]', action='store_true', required=False, default=False, dest='CN')
-    parser.add_argument('-p', '--permutation_times', help='Need to do permutation and set the permuation times [Range: 0, 10, 100, 10000, 10000]. Default is 0 and no permutation is performed.', required=False, type=int, default=0, dest='permutation_times', metavar='INT') #choices=[0, 10, 100, 1000, 10000]
-    parser.add_argument('-@', '--threads', help='Threads to use [Default: 1]', required=False, default=1, type=int, dest='threads', metavar='INT')
-
+    parser.add_argument('-p', '--permutation_times', help='Need to do permutation and set the permuation times [Range: 0, 10, 100, 10000, 10000]. Default is 0 and no permutation is performed.', required=False, type=int, default=0, dest='permutation_times', metavar='PERM_TIMES') #choices=[0, 10, 100, 1000, 10000]
+    parser.add_argument('-@', '--threads', help='Threads for permutation test [Default: 4]', required=False, default=4, type=int, dest='threads', metavar='THREADS')
+    parser.add_argument('-s', '--seed', help='Set seed for simulation for reproducibility of the results [Default: 1]', required=False, default=1, type=int, dest='seed', metavar='SEED')
+    parser.add_argument('-f', '--threshold', help='Evolink index top percentage cutoff to filter in genes for permutation tests [Range: 0-1; Default: 0.02]', required=False, default=0.02, type=float, dest='threshold', metavar='THRESHOLD')
+    parser.add_argument('-a', '--alpha', help='Adjusted p-value cutoff [Range: 0-1; Default: 0.05]', required=False, default=0.05, type=float, dest='alpha', metavar='ALPHA')
+    
     # Output
-    parser.add_argument('-o', '--output', help='Output file', required=True, dest='output', metavar='FILE_PATH')
+    parser.add_argument('-o', '--output', help='Output file', required=True, dest='output', metavar='OUTPUT')
     
     args = parser.parse_args()
     pipeline(args)
