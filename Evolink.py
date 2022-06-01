@@ -182,7 +182,7 @@ def pipeline(args):
         df["higher_pval.adj"] = np.nan
         df["lower_pval.adj"] = np.nan
 
-        print("[",datetime.datetime.now(),"]","Filter genes with", threshold, "%")
+        print("[",datetime.datetime.now(),"]","Filter genes with", threshold, "% threshold")
         df['Evolink_index.abs'] = df['Evolink_index'].abs()
         # top threshold % fraction genes of abs(Evolink_index)
         kept_genes = df.nlargest(int(len(df)*threshold),'Evolink_index.abs').index
