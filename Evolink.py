@@ -90,35 +90,32 @@ def generate_tree(tree_file, species_sub):
     os.close(fd)
     return (path, br_len)
 
-def simulate_phen(tree_file, phen_file, perm_times, seed=1):
-
-    rcode = '''
-    suppressPackageStartupMessages(library(geiger))
-    set.seed('''+str(seed)+''')
-    cn2bi<-function(x, n){
-        cutoff=sort(x, decreasing = TRUE)[n]
-        return(as.integer(x >= cutoff))
-    }
-    simTrait=function(tree, phen, perm_times=10000){
-        phen_pos_n=sum(phen)
-        rateMat=ratematrix(tree, phen)
-        sim_res=sim.char(tree, rateMat, nsim = perm_times)
-        sim_table=data.frame(sim_res)
-        colnames(sim_table)=paste0("N", 1:perm_times)
-        bi_sim_table=data.frame(apply(sim_table, 2, cn2bi, n=phen_pos_n))
-        rownames(bi_sim_table)=rownames(sim_res)
-        return(bi_sim_table)
-    }
-    tree=read.tree("'''+tree_file+'''")
-    phen=read.table("'''+phen_file+'''", header=T, row.names=1)
-    sim_data = simTrait(tree, phen, perm_times='''+str(perm_times)+''')
-    '''
-    sim_data = robjects.r(rcode)
-
+def sig_genes(df, p_threshold, e_threshold, alpha):
     with localconverter(robjects.default_converter + pandas2ri.converter):
-        sim_df = robjects.conversion.rpy2py(sim_data)
-
-    return(sim_df)
+        r_df = robjects.conversion.py2rpy(df)
+    robjects.globalenv['r_df'] = r_df
+    robjects.globalenv['p_threshold'] = p_threshold
+    robjects.globalenv['e_threshold'] = e_threshold
+    robjects.globalenv['alpha'] = alpha
+    rcode = '''
+    suppressPackageStartupMessages({
+        library(fdrtool)
+        suppressWarnings(library(tidyverse))
+    })
+    r_df = r_df %>% rownames_to_column(var = "orthoID")
+    dt = r_df %>% filter(Prevalence_index >= -1*p_threshold)
+    fdrres = fdrtool(dt$Evolink_index, statistic="normal", plot=F, verbose=F)
+    dt$pvalue=fdrres$pval
+    dt$qvalue=fdrres$qval
+    dt = dt %>% mutate(significance=ifelse(pvalue < 0.05 & qvalue < alpha & abs(Evolink_index) >= e_threshold, "sig", NA))
+    r_df = r_df %>% select(orthoID, Prevalence_index, Evolink_index) %>% 
+                left_join(dt, by = c("orthoID", "Prevalence_index", "Evolink_index")) %>% 
+                select(orthoID, Prevalence_index, Evolink_index, significance, pvalue, qvalue)
+    '''
+    r_df = robjects.r(rcode)
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        res_df = robjects.conversion.rpy2py(r_df)
+    return res_df
 
 def pipeline(args):
 
@@ -126,37 +123,33 @@ def pipeline(args):
     trait_table = args.trait_table
     tree_file = args.tree_file
     CN = args.CN
-    permutation_times = args.permutation_times
-    # all_threads = args.threads
-    threads = args.threads
-    seed = args.seed
-    threshold = args.threshold
+    p_threshold = args.p_threshold
+    e_threshold = args.e_threshold
     alpha = args.alpha
     output = args.output
 
-    # ### Set theads ###
-    # if all_threads <= 4:
-    #     faith_pd_threads = all_threads - 1
-    # elif 4 < all_threads <= 8:
-    #     faith_pd_threads = 4
-    # else:
-    #     faith_pd_threads = 8
-    # threads = all_threads - faith_pd_threads
-    # os.putenv("OMP_NUM_THREADS", str(faith_pd_threads))
-    # print(faith_pd_threads, threads)
+    if CN:
+        cn = "-c "
+    else:
+        cn = ""
 
+    ### Print command line ###
+    print("Command line: python Evolink.py -g {0} -t {1} -n {2} {3}-f {4} -e {5} -a {6} -o {7}".format(gene_table, trait_table,
+                                                                                                        tree_file, cn,
+                                                                                                        p_threshold, e_threshold,
+                                                                                                        alpha, output), flush=True)
     ### Read trait data ###
-    print("[",datetime.datetime.now(),"]","Read trait data")
+    print("[",datetime.datetime.now(),"]","Read trait data", flush=True)
     trait_df = pd.read_csv(trait_table, sep='\t',index_col=0)
     species_list = trait_df.index.values
     trait_matrix = trait_df.values
 
     ### Read gene data ###
-    print("[",datetime.datetime.now(),"]","Read gene data")
+    print("[",datetime.datetime.now(),"]","Read gene data", flush=True)
     gene_df = pd.read_csv(gene_table, sep='\t',index_col=0)
     gene_df = gene_df[species_list]
     if CN:
-        gene_df.values = np.where(gene_df.values > 0, 1, 0)
+        gene_df[:] = np.where(gene_df > 0, 1, 0)
     gene_list = gene_df.index.values
     gene_species_list = gene_df.columns.values
     gene_matrix = gene_df.values
@@ -168,72 +161,17 @@ def pipeline(args):
         raise ValueError("Dimmension of genotype file do not match that of trait file")
 
     ### Calculate Evolink index ###
-    print("[",datetime.datetime.now(),"]","Calculate Evolink index")
+    print("[",datetime.datetime.now(),"]","Calculate Evolink index", flush=True)
     df = Evolink_calculation(trait_matrix, gene_matrix, 
                              species_list, gene_list, tree_file)
 
-    ### Perform permutation test ###
-    if permutation_times > 0:
-        # default labels for all genes
-        df["label"] = "ns"
-        df["higher_pval"] = np.nan
-        df["lower_pval"] = np.nan
-        df["higher_pval.adj"] = np.nan
-        df["lower_pval.adj"] = np.nan
-
-        print("[",datetime.datetime.now(),"]","Filter genes with", threshold, "% threshold")
-        df['Evolink_index.abs'] = df['Evolink_index'].abs()
-        # top threshold % fraction genes of abs(Evolink_index)
-        kept_genes = df.nlargest(int(len(df)*threshold),'Evolink_index.abs').index
-        kept_gene_df = gene_df.loc[kept_genes]
-        kept_genes_matrix = kept_gene_df.values
-        kept_gene_list = kept_gene_df.index.values
-        print("Keep", kept_gene_df.shape[0],"/",df.shape[0], "genes")
-
-        from multiprocessing import get_context
-        from functools import partial
-        import statsmodels.stats.multitest as smm
-
-        print("[",datetime.datetime.now(),"]","Perform permutation test")
-
-        simfun=partial( Evolink_calculation,
-            gene_matrix = kept_genes_matrix,
-            species_list = species_list,
-            gene_list = kept_gene_list,
-            tree_file = tree_file)
-
-        perm_df = simulate_phen(tree_file, trait_table, permutation_times, seed)
-
-        print("[",datetime.datetime.now(),"]","Simulate", permutation_times, "times")
-        trait_matrix_input = []
-        perm_df = perm_df.reindex(species_list)
-        for (columnName, columnData) in perm_df.iteritems():
-            perm_trait_mat = columnData.values
-            trait_matrix_input.append(perm_trait_mat)
-
-        # get_context("spawn") might solve the occupation of multiprocesses called by faith_pd in the unifrac module
-        with get_context("spawn").Pool(processes=threads) as pool:
-            # tqdm is used to show progress bar
-            sim_list_arr = list(tqdm(pool.imap_unordered(simfun, trait_matrix_input), total=len(trait_matrix_input)))
-            pool.close()
-            pool.join()
-        sim_res= np.stack(sim_list_arr,axis=0)[:,:,1].T
-
-        evolink_value = df.loc[kept_genes, "Evolink_index"].values
-        repeats_array = np.transpose([evolink_value] * permutation_times) # an array of len(evolink_value)*permutation_times length
-        
-        lower_pval = (np.sum(np.less(repeats_array, sim_res),axis=1)+1)/(permutation_times+1)
-        higher_pval = (np.sum(np.greater(repeats_array, sim_res),axis=1)+1)/(permutation_times+1)
-        
-        df.loc[kept_genes, "higher_pval"] = higher_pval
-        df.loc[kept_genes, "lower_pval"] = lower_pval
-        df.loc[kept_genes, "higher_pval.adj"] = smm.multipletests(df.loc[kept_genes, "higher_pval"].values, method="fdr_bh")[1]
-        df.loc[kept_genes, "lower_pval.adj"] = smm.multipletests(df.loc[kept_genes, "lower_pval"].values, method="fdr_bh")[1]
-        df.loc[((df["lower_pval"] < 0.05) & (df["lower_pval.adj"] < alpha)) | (df["higher_pval"] < 0.05) & (df["higher_pval.adj"] < alpha), "label"] = "sig"
+    ### Get pvalues and qvalues ###
+    print("[",datetime.datetime.now(),"]","Find significant genes", flush=True)
+    res_df = sig_genes(df, p_threshold, e_threshold, alpha)
 
     ### Output ###
-    print("[",datetime.datetime.now(),"]","Output result")
-    df.to_csv(output, sep="\t", na_rep='NaN')
+    print("[",datetime.datetime.now(),"]","Output result", flush=True)
+    res_df.to_csv(output, sep="\t", index=False, na_rep='NA')
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -249,11 +187,9 @@ if __name__ == "__main__":
 
     # Optional Input
     parser.add_argument('-c', '--copy_number', help='The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]', action='store_true', required=False, default=False, dest='CN')
-    parser.add_argument('-p', '--permutation_times', help='Need to do permutation and set the permuation times [Range: 0, 10, 100, 10000, 10000]. Default is 0 and no permutation is performed.', required=False, type=int, default=0, dest='permutation_times', metavar='PERM_TIMES') #choices=[0, 10, 100, 1000, 10000]
-    parser.add_argument('-@', '--threads', help='Threads for permutation test [Default: 4]', required=False, default=4, type=int, dest='threads', metavar='THREADS')
-    parser.add_argument('-s', '--seed', help='Set seed for simulation for reproducibility of the results [Default: 1]', required=False, default=1, type=int, dest='seed', metavar='SEED')
-    parser.add_argument('-f', '--threshold', help='Evolink index top percentage cutoff to filter in genes for permutation tests [Range: 0-1; Default: 0.02]', required=False, default=0.02, type=float, dest='threshold', metavar='THRESHOLD')
-    parser.add_argument('-a', '--alpha', help='Adjusted p-value cutoff [Range: 0-1; Default: 0.05]', required=False, default=0.05, type=float, dest='alpha', metavar='ALPHA')
+    parser.add_argument('-f', '--p_threshold', help='Absolute Prevalence index cutoff to filter in genes for permutation tests [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
+    parser.add_argument('-e', '--e_threshold', help='Absolute Evolink index cutoff to filter in genes for permutation tests [Range: 0-1; Default: 0.1]', required=False, default=0.1, type=float, dest='e_threshold', metavar='THRESHOLD')
+    parser.add_argument('-a', '--alpha', help='Adjusted p-value (or qvalue) cutoff [Range: 0-1; Default: 0.05]', required=False, default=0.05, type=float, dest='alpha', metavar='ALPHA')
     
     # Output
     parser.add_argument('-o', '--output', help='Output file', required=True, dest='output', metavar='OUTPUT')
