@@ -177,7 +177,6 @@ def iTOL_input(tree_file, trait_df, gene_df, df, prefix, pos_top=5, neg_top=5):
 
 def plot_fig(gene_table, trait_table, tree_file, outdir, CI=3, pos_top=5, neg_top=5, display_mode=1):
     import subprocess
-    
     outfile = os.path.join(outdir, "result.tsv")
     script_dir = os.path.abspath(os.path.dirname( __file__ ))
 
@@ -281,9 +280,7 @@ def pipeline(args):
 if __name__ == "__main__":
     from argparse import ArgumentParser
 
-    parser = ArgumentParser(description='Evolink is designed to find gene families associated with given trait with the help of phylogeny information.\n'+ \
-    'Examples: [With binary gene table] python Evolink.py -g test/gene.tsv -t test/trait.tsv -n test/tree.nwk -o test_res.tsv; \n'+ \
-    '[With non-binary gene table] python Evolink.py -g test/gene_CN.tsv -c -t test/trait.tsv -n test/tree.nwk -o test_res.tsv.')
+    parser = ArgumentParser(description='Evolink is designed to find gene families associated with given trait with the help of phylogeny information.')
     
     # Essential Input
     parser.add_argument('-g', '--genotype', help='Tab-delimited gene presence/absence or copy number table. Columns are gene families, while rows are tip names/species/genomes in the phylogenetic tree. If copy number table is provided, please use -c option so that it will be internally converted to binary table. Presence=1, Absence=0.', required=True, dest='gene_table', metavar='GENE_TABLE')

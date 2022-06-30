@@ -11,6 +11,10 @@
 
 ## Contents
 
+A detailed document is provided here: [Evolink pages](https://nlm-irp-jianglab.github.io/Evolink).
+
+---
+
 - [Overview](#overview)
 - [Installation](doc/install.md)
 - [Example usage](#example-usage)
@@ -25,9 +29,3 @@
   - [Command-line interface](doc/cli.md), [Test datasets](test), [Computational efficiency](doc/perform.md)
 - [Citation](#citation)
 - [Contact](#contact)
-
-## Overview
-
-### What does Evolink do
-
-
