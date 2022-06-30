@@ -49,29 +49,21 @@ optional arguments:
                         output directory
 ```
 
-- Examples
+Examples
 ```
-### With binary gene presence/absence table (most common):
+1. With binary gene presence/absence table (most common):
 python Evolink.py -g test/gene.tsv -t test/trait.tsv -n test/tree.nwk -o output_dir
-```
 
-```
-### With gene copy number table (add "-c" option):
+2. With gene copy number table (add "-c" option):
 python Evolink.py -g test/gene_CN.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir_CN
-```
 
-```
-### Enable plot function (add "-v" option. To save time, Evolink will not generate figures by default):
+3. Enable plot function (add "-v" option. To save time, Evolink will not generate figures by default):
 python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -v
-```
 
-```
-### More complex usage. "-N" is to map top 9 positively and top 8 negatively associated genes in the plot; "-m" is to use circular layout for the tree and "-f" is to force ovrewrite the output directory if it already exists:
+4. More complex usage. "-N" is to map top 9 positively and top 8 negatively associated genes in the plot; "-m" is to use circular layout for the tree and "-f" is to force ovrewrite the output directory if it already exists:
 python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -v -N 9,8 -m 1 -f
-```
 
-```
-### We also provided a script "Evolink_plot.R" to individually generate figures after you get the result from Evolink (i.e. result.tsv):
+5. We also provided a script "Evolink_plot.R" to individually generate figures after you get the result from Evolink (i.e. result.tsv):
 Rscript --vanilla ../Evolink_plot.R -g gene.tsv -t trait.tsv -n tree.nwk -r output_dir/result.tsv -o plot_dir
 ```
 
