@@ -3,7 +3,7 @@
 
 import pandas as pd
 import numpy as np
-import os, shutil, sys, tempfile, datetime, time
+import os, shutil, sys, tempfile, datetime, subprocess
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
@@ -11,6 +11,8 @@ from unifrac import faith_pd
 from biom.util import biom_open
 from biom.table import Table
 # from tqdm import tqdm
+
+global alpha2CI = {0.80:1.282, 0.85:1.44, 0.9:1.645, 0.95:1.960, 0.99:2.576, 0.995:2.807, 0.997:3.0, 0.999:3.291}
 
 def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree_file):
 
@@ -91,7 +93,6 @@ def generate_tree(tree_file, species_sub):
     return (path, br_len)
 
 def sig_genes(df, prevalence_cutoff, rare_cutoff, p_threshold, e_threshold, alpha):
-    alpha2CI = {0.80:1.282, 0.85:1.44, 0.9:1.645, 0.95:1.960, 0.99:2.576, 0.995:2.807, 0.997:3.0, 0.999:3.291}
     with localconverter(robjects.default_converter + pandas2ri.converter):
         r_df = robjects.conversion.py2rpy(df)
     robjects.globalenv['r_df'] = r_df
@@ -116,7 +117,7 @@ def sig_genes(df, prevalence_cutoff, rare_cutoff, p_threshold, e_threshold, alph
     r_df = robjects.r(rcode)
     with localconverter(robjects.default_converter + pandas2ri.converter):
         res_df = robjects.conversion.rpy2py(r_df)
-    return(res_df, alpha2CI[alpha])
+    return(res_df)
 
 def extract_list(lst, index_list):
     return(",".join([str(lst[i]) for i in [0]+index_list]))
@@ -176,7 +177,6 @@ def iTOL_input(tree_file, trait_df, gene_df, df, prefix, pos_top=5, neg_top=5):
     print("[",datetime.datetime.now(),"]", "iTOL inputs generated at", zip_path, flush=True)
 
 def plot_fig(gene_table, trait_table, tree_file, outdir, CI=3, pos_top=5, neg_top=5, display_mode=1):
-    import subprocess
     outfile = os.path.join(outdir, "result.tsv")
     script_dir = os.path.abspath(os.path.dirname( __file__ ))
 
@@ -264,7 +264,8 @@ def pipeline(args):
     rare_cutoff = 2*(minority_ct*0.25/all_ct)-1 
     majority_ct = all_ct - minority_ct
     prevalence_cutoff = 2*(majority_ct/all_ct)-1
-    res_df, CI = sig_genes(df, prevalence_cutoff, rare_cutoff, p_threshold, e_threshold, alpha)
+    res_df = sig_genes(df, prevalence_cutoff, rare_cutoff, p_threshold, e_threshold, alpha)
+    CI = alpha2CI[alpha]
 
     ### Output ###
     print("[",datetime.datetime.now(),"]","Output result", flush=True)

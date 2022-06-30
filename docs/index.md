@@ -24,9 +24,7 @@ Evolink is designed to find gene families associated with given trait with the h
 optional arguments:
   -h, --help            show this help message and exit
   -g GENE_TABLE, --genotype GENE_TABLE
-                        Tab-delimited gene presence/absence or copy number table. Columns are gene families, while rows are tip names/species/genomes in
-                        the phylogenetic tree. If copy number table is provided, please use -c option so that it will be internally converted to binary
-                        table. Presence=1, Absence=0.
+                        Tab-delimited gene presence/absence or copy number table. Columns are gene families, while rows are tip names/species/genomes in the phylogenetic tree. If copy number table is provided, please use -c option so that it will be internally converted to binary table. Presence=1, Absence=0.
   -t TRAIT_TABLE, --phenotype TRAIT_TABLE
                         Two-column (so far only one trait is allowed each time) tab-delimited trait presence/absence table. The first column is tip names
                         and the second column is the presence/absence of this trait on the tips/species/genomes. Presence=1, Absence=0.
@@ -62,10 +60,23 @@ python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o outp
 
 4. More complex usage. "-N" is to map top 9 positively and top 8 negatively associated genes in the plot; "-m" is to use circular layout for the tree and "-f" is to force ovrewrite the output directory if it already exists:
 python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -v -N 9,8 -m 1 -f
+```
 
-5. We also provided a script "Evolink_plot.R" to individually generate figures after you get the result from Evolink (i.e. result.tsv):
+### Gallery
+When enabling the plot function, Evolink provides in the ourtput directory a tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called "Evolink_itol_input.zip" for users to visualize their trees on the [Tree of Life (iTOL)](https://itol.embl.de/).
+
+1. You can simply upload the "input.tree" to iTOL website and drag "binary.txt" to the tree page for visualization.
+2. Or after installing (iTOL API)[https://github.com/iBiology/iTOL], you can use the following command line to upload and annotate your tree:
+```
+itol Evolink_itol_input.zip -i <your iTOL upload API key> -p <project_name>
+```
+
+In addition, we also provided a script "Evolink_plot.R" to individually generate local figures after you get the result from Evolink (i.e. result.tsv):
+```
 Rscript --vanilla ../Evolink_plot.R -g gene.tsv -t trait.tsv -n tree.nwk -r output_dir/result.tsv -o plot_dir
 ```
+
+### Support or Contact
 
 - Bulleted
 - Lists
@@ -76,13 +87,5 @@ Rscript --vanilla ../Evolink_plot.R -g gene.tsv -t trait.tsv -n tree.nwk -r outp
 **Bold** and _Italic_ and `Code` text
 
 [Link](url) and ![Image](src)
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/nlm-irp-jianglab/Evolink/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
