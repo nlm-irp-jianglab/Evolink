@@ -30,18 +30,4 @@
 
 ### What does Evolink do
 
-Woltka processes [**alignments**](doc/input.md) -- the mappings of microbiome sequencing data against reference sequences (such as genomes or genes), and [infers the best placement](doc/classify.md) of the queries in a hierarchical [classification system](doc/hierarchy.md). One query could have simultaneous matches in multiple references. Woltka finds the most suitable classification unit(s) to describe the query accordingly the criteria specified by the user. Woltka generates [**profiles**](doc/output.md) (feature tables) -- the abundances of classification units which describe the structure or function of microbial communities.
 
-### What else does Woltka do
-
-Woltka provides several utilities for handling feature tables, including [normalizing](doc/normalize.md) data, [collapsing](doc/collapse.md) a table to higher-level features, calculating feature group [coverage](doc/coverage.md), [filtering](doc/filter.md) features based on per-sample abundance, and [merging](doc/merge.md) tables.
-
-### What does Woltka not do
-
-Woltka does NOT **align** sequences. You need to align your sequencing data (FastQ, etc.) against a reference database (we recommend [WoL](wol.md)) using an aligner of your choice (e.g., [Bowtie2](doc/align.md#alignment-with-bowtie2)). The resulting alignment files can be fed into Woltka.
-
-Woltka does NOT **analyze** profiles. We recommend using [QIIME 2](https://qiime2.org/) for robust downstream analyses of the profiles to decode the relationships among microbial communities and with their environments.
-
-Flowchart of Woltka's main classification workflow:
-
-![Woltka process](doc/img/process.png)
