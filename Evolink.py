@@ -3,14 +3,14 @@
 
 import pandas as pd
 import numpy as np
-import os, tempfile, datetime
+import os, shutil, sys, tempfile, datetime, time
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
 from unifrac import faith_pd
 from biom.util import biom_open
 from biom.table import Table
-from tqdm import tqdm
+# from tqdm import tqdm
 
 def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree_file):
 
@@ -40,8 +40,8 @@ def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree
     Evolink_index = (G1T1_T1 - G1T0_T0 + G0T0_T0 - G0T1_T1)*0.5
     Prevalence_index = (G1T1_T1 + G1T0_T0 - G0T1_T1 - G0T0_T0)*0.5
 
-    result = np.vstack((Prevalence_index, Evolink_index)).T
-    df = pd.DataFrame(result, columns=["Prevalence_index", "Evolink_index"], index=gene_list)
+    result = np.vstack((G1T1_T1, G1T0_T0, G0T0_T0, G0T1_T1, Prevalence_index, Evolink_index)).T
+    df = pd.DataFrame(result, columns=["G1T1_T1", "G1T0_T0", "G0T0_T0", "G0T1_T1", "Prevalence_index", "Evolink_index"], index=gene_list)
     return df
 
 def matrix2hdf5(mat, row_names, col_names, outfile):
@@ -90,32 +90,104 @@ def generate_tree(tree_file, species_sub):
     os.close(fd)
     return (path, br_len)
 
-def sig_genes(df, p_threshold, e_threshold, alpha):
+def sig_genes(df, prevalence_cutoff, rare_cutoff, p_threshold, e_threshold, alpha):
+    alpha2CI = {0.80:1.282, 0.85:1.44, 0.9:1.645, 0.95:1.960, 0.99:2.576, 0.995:2.807, 0.997:3.0, 0.999:3.291}
     with localconverter(robjects.default_converter + pandas2ri.converter):
         r_df = robjects.conversion.py2rpy(df)
     robjects.globalenv['r_df'] = r_df
-    robjects.globalenv['p_threshold'] = p_threshold
-    robjects.globalenv['e_threshold'] = e_threshold
-    robjects.globalenv['alpha'] = alpha
+    robjects.globalenv['prevalence_cutoff'] = float(prevalence_cutoff)
+    robjects.globalenv['rare_cutoff'] = float(rare_cutoff)
+    robjects.globalenv['p_threshold'] = float(p_threshold)
+    robjects.globalenv['e_threshold'] = float(e_threshold)
+    robjects.globalenv['CI'] = alpha2CI[alpha]
     rcode = '''
     suppressPackageStartupMessages({
-        library(fdrtool)
         suppressWarnings(library(tidyverse))
     })
     r_df = r_df %>% rownames_to_column(var = "orthoID")
-    dt = r_df %>% filter(Prevalence_index >= -1*p_threshold)
-    fdrres = fdrtool(dt$Evolink_index, statistic="normal", plot=F, verbose=F)
-    dt$pvalue=fdrres$pval
-    dt$qvalue=fdrres$qval
-    dt = dt %>% mutate(significance=ifelse(pvalue < 0.05 & qvalue < alpha & abs(Evolink_index) >= e_threshold, "sig", NA))
+    dt = r_df %>% filter(Prevalence_index >= min(-1*p_threshold, rare_cutoff), Prevalence_index <= max(p_threshold, prevalence_cutoff))
+    std = sd(dt$Evolink_index)
+    dt = dt %>% mutate(z_score=(Evolink_index-0)/std, significance=ifelse(abs(z_score)>=CI & abs(Evolink_index) >= e_threshold, "sig", NA))
     r_df = r_df %>% select(orthoID, Prevalence_index, Evolink_index) %>% 
                 left_join(dt, by = c("orthoID", "Prevalence_index", "Evolink_index")) %>% 
-                select(orthoID, Prevalence_index, Evolink_index, significance, pvalue, qvalue)
+                mutate(z_score=(Evolink_index-0)/std) %>% 
+                select(orthoID, Prevalence_index, Evolink_index, significance, z_score)
     '''
     r_df = robjects.r(rcode)
     with localconverter(robjects.default_converter + pandas2ri.converter):
         res_df = robjects.conversion.rpy2py(r_df)
-    return res_df
+    return(res_df, alpha2CI[alpha])
+
+def extract_list(lst, index_list):
+    return(",".join([str(lst[i]) for i in [0]+index_list]))
+
+def iTOL_data(trait_df, gene_df, pos_genes, neg_genes):
+    # set field annotation
+    field_shapes = ",".join(['2'] + ['1']*len(pos_genes) + ['1']*len(neg_genes))
+    field_labels = ",".join(["Trait"] + pos_genes + neg_genes)
+    pos_palette = ['#93003a', '#a62045', '#b73651', '#c84b5e', '#d7606d', '#e4757d', '#ef8a8f', '#f8a1a2', '#ffb7b7', '#ffd0cf']
+    len_pos_pal = len(pos_palette)
+    neg_palette = ['#00429d', '#2255a0', '#3866a5', '#4d77ac', '#6188b4', '#7699bd', '#8baac6', '#a1bbd1', '#b7ccdc', '#cfdde7']
+    len_neg_pal = len(neg_palette)
+    field_colors = ",".join(['#FFB844'] + pos_palette*int(len(pos_genes)/len_pos_pal) + pos_palette[:len(pos_genes)%len_pos_pal] \
+                   + neg_palette*int(len(neg_genes)/len_neg_pal) + neg_palette[:len(neg_genes)%len_neg_pal]) \
+    # set legend annotation
+    legend_title = "Annotated Tree"
+    legend_position_x = '0'
+    legend_position_y = '1000'
+    legend_shapes = field_shapes
+    legend_labels = field_labels
+    legend_colors = field_colors
+    subset_gene_df = gene_df.loc[pos_genes + neg_genes]
+
+    comb_df = pd.concat([trait_df,subset_gene_df.T], axis=1)
+    data = list(comb_df.to_records(index=True))
+    data = [tuple(e) for e in data]
+    return(data, legend_title, legend_position_x, legend_position_y, 
+           legend_shapes, legend_labels, legend_colors,
+           field_shapes, field_labels, field_colors)
+
+def iTOL_input(tree_file, trait_df, gene_df, df, prefix, pos_top=5, neg_top=5):
+    # display_mode:1=rectangular, 2=circular.
+    import zipfile
+    itol_tree_path = os.path.join(prefix, "input.tree")
+    shutil.copy(tree_file, itol_tree_path)
+    zip_path = os.path.join(prefix, "Evolink_itol_input.zip")
+    with zipfile.ZipFile(zip_path, mode="w") as archive:
+        archive.write(itol_tree_path, os.path.basename(itol_tree_path))
+
+    pos_genes = df[(df["significance"]=="sig") & (df["Evolink_index"] > 0)].sort_values(by='Evolink_index', ascending=False).head(pos_top)["orthoID"].to_list()
+    neg_genes = df[(df["significance"]=="sig") & (df["Evolink_index"] < 0)].sort_values(by='Evolink_index').head(neg_top)["orthoID"].to_list()
+    
+    from iTOL import TOL
+    t = TOL(zfile=zip_path, wd=prefix)
+    # for each tip, it will have 1 phenotype + pos_top genotypes + neg_top genotypes
+    data, legend_title, legend_position_x, legend_position_y, legend_shapes, legend_labels, legend_colors, field_shapes, field_labels, field_colors = iTOL_data(trait_df, gene_df, pos_genes, neg_genes)
+    t.binary(data, separator='comma', dataset_label='binary', 
+             field_shapes=field_shapes, field_labels=field_labels,
+             field_colors=field_colors, legend_title=legend_title, legend_position_x=legend_position_x, 
+             legend_position_y=legend_position_y, legend_shapes=legend_shapes, 
+             legend_labels=legend_labels, legend_colors=legend_colors)
+
+    annot_path = os.path.join(prefix, "binary.txt")
+    with zipfile.ZipFile(zip_path, mode="a") as archive:
+        archive.write(annot_path, os.path.basename(annot_path))
+    
+    print("[",datetime.datetime.now(),"]", "iTOL inputs generated at", zip_path, flush=True)
+
+def plot_fig(gene_table, trait_table, tree_file, outdir, CI=3, pos_top=5, neg_top=5, display_mode=1):
+    import subprocess
+    
+    outfile = os.path.join(outdir, "result.tsv")
+    script_dir = os.path.abspath(os.path.dirname( __file__ ))
+
+    cmd = "Rscript --vanilla {0}/Evolink_plot.R -g {1} -t {2} -n {3} -r {4} -c {5} -a {6} -b {7} -m {8} -o {9}".format(
+        script_dir,
+        gene_table, trait_table, tree_file, outfile, 
+        CI, pos_top, neg_top, display_mode, outdir
+    )
+    print("Plot command line:", cmd, flush=True)
+    subprocess.call(cmd, shell=True)
 
 def pipeline(args):
 
@@ -126,18 +198,37 @@ def pipeline(args):
     p_threshold = args.p_threshold
     e_threshold = args.e_threshold
     alpha = args.alpha
+    plot = args.plot
+    top_genes = args.top_genes
+    display_mode = args.display_mode
+    force = args.force
     output = args.output
 
-    if CN:
-        cn = "-c "
+    if os.path.exists(output) and os.path.isdir(output):
+        if force:
+            shutil.rmtree(output)
+            os.makedirs(output)
+        else:
+            sys.exit("Error: {} already exists. To force overwrite it use -f or --force.".format(output))
     else:
-        cn = ""
+        os.makedirs(output)
+
+    pos_top, neg_top = [int(i) for i in top_genes.split(",")]
 
     ### Print command line ###
-    print("Command line: python Evolink.py -g {0} -t {1} -n {2} {3}-f {4} -e {5} -a {6} -o {7}".format(gene_table, trait_table,
-                                                                                                        tree_file, cn,
-                                                                                                        p_threshold, e_threshold,
-                                                                                                        alpha, output), flush=True)
+    cn = "-c " if CN else ""
+    mode = "-m " if display_mode else ""
+    vis = "-v " if plot else ""
+    f = "-f " if force else ""
+    cmd = "python Evolink.py -g {0} -t {1} -n {2} {3}-p {4} -e {5} -a {6} {7}-N {8} {9}-o {10} {11}".format(
+        gene_table, trait_table,
+        tree_file, cn,
+        p_threshold, e_threshold,
+        alpha, vis, top_genes, 
+        mode, output, f
+    )
+    print("Main command line:", cmd, flush=True)
+
     ### Read trait data ###
     print("[",datetime.datetime.now(),"]","Read trait data", flush=True)
     trait_df = pd.read_csv(trait_table, sep='\t',index_col=0)
@@ -167,11 +258,25 @@ def pipeline(args):
 
     ### Get pvalues and qvalues ###
     print("[",datetime.datetime.now(),"]","Find significant genes", flush=True)
-    res_df = sig_genes(df, p_threshold, e_threshold, alpha)
+    pos_ct=np.sum(trait_matrix, axis=0)[0]
+    all_ct = trait_matrix.shape[0]
+    minority_ct = min(pos_ct, all_ct-pos_ct)
+    # genes only existing in 25% of minority will still be kept
+    rare_cutoff = 2*(minority_ct*0.25/all_ct)-1 
+    majority_ct = all_ct - minority_ct
+    prevalence_cutoff = 2*(majority_ct/all_ct)-1
+    res_df, CI = sig_genes(df, prevalence_cutoff, rare_cutoff, p_threshold, e_threshold, alpha)
 
     ### Output ###
     print("[",datetime.datetime.now(),"]","Output result", flush=True)
-    res_df.to_csv(output, sep="\t", index=False, na_rep='NA')
+    outfile = os.path.join(output, "result.tsv")
+    res_df.to_csv(outfile, sep="\t", index=False, na_rep='NA')
+
+    ### Plot ####
+    if plot:
+        print("[",datetime.datetime.now(),"]","Generate figures", flush=True)
+        iTOL_input(tree_file, trait_df, gene_df, res_df, output, pos_top, neg_top)
+        plot_fig(gene_table, trait_table, tree_file, output, CI, pos_top, neg_top, display_mode)
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -187,12 +292,16 @@ if __name__ == "__main__":
 
     # Optional Input
     parser.add_argument('-c', '--copy_number', help='The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]', action='store_true', required=False, default=False, dest='CN')
-    parser.add_argument('-f', '--p_threshold', help='Absolute Prevalence index cutoff to filter in genes for permutation tests [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
-    parser.add_argument('-e', '--e_threshold', help='Absolute Evolink index cutoff to filter in genes for permutation tests [Range: 0-1; Default: 0.1]', required=False, default=0.1, type=float, dest='e_threshold', metavar='THRESHOLD')
-    parser.add_argument('-a', '--alpha', help='Adjusted p-value (or qvalue) cutoff [Range: 0-1; Default: 0.05]', required=False, default=0.05, type=float, dest='alpha', metavar='ALPHA')
+    parser.add_argument('-p', '--p_threshold', help='Absolute Prevalence index threshold to filter in genes for permutation tests [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
+    parser.add_argument('-e', '--e_threshold', help='Absolute Evolink index threshold to filter in genes for permutation tests [Range: 0-1; Default: 0.1]', required=False, default=0.1, type=float, dest='e_threshold', metavar='THRESHOLD')
+    parser.add_argument('-a', '--alpha', help='Tail of area cutoff [Range: 0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999; Default: 0.997]', choices=[0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999], required=False, default=0.997, type=float, dest='alpha', metavar='ALPHA')
+    parser.add_argument('-v', '--visualization', help='Whether to generate plots', action='store_true', required=False, default=False, dest='plot')
+    parser.add_argument('-N', '--top_genes', help='Top positively and negatively associated genes mapped to tree. [Default: 5,5 for top 5 pos genes and top 5 neg genes.]', required=False, default='5,5', type=str, dest='top_genes')
+    parser.add_argument('-m', '--display-mode', help='Tree display mode. [1: circular, 2: rectangular; Default: 1]', type=int, choices=[1, 2], required=False, default=1, dest='display_mode')
+    parser.add_argument('-f', '--force', help='Force to overwrite output folder. [Default: False]', action='store_true', required=False, default=False, dest='force')
     
     # Output
-    parser.add_argument('-o', '--output', help='Output file', required=True, dest='output', metavar='OUTPUT')
+    parser.add_argument('-o', '--output', help='output directory', required=True, dest='output', metavar='OUTPUT')
     
     args = parser.parse_args()
     pipeline(args)
