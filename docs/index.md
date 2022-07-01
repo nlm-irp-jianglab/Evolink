@@ -69,13 +69,19 @@ Examples
 ```
 1. With binary gene presence/absence table (most common):
 python Evolink.py -g test/gene.tsv -t test/trait.tsv -n test/tree.nwk -o output_dir
+```
 
+```
 2. With gene copy number table (add "-c" option):
 python Evolink.py -g test/gene_CN.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir_CN
+```
 
+```
 3. Enable plot function (add "-v" option. To save time, Evolink will not generate figures by default):
 python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -v
+```
 
+```
 4. More complex usage. "-N" is to map top 9 positively and top 8 negatively associated genes in the plot; "-m" is to use circular layout for the tree and "-f" is to force ovrewrite the output directory if it already exists:
 python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -v -N 9,8 -m 1 -f
 ```
@@ -84,7 +90,7 @@ python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o outp
 When enabling the plot function, Evolink provides in the ourtput directory a tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called "Evolink_itol_input.zip" for users to visualize their trees on the [Tree of Life (iTOL)](https://itol.embl.de/).
 
 1. You can simply upload the "input.tree" to iTOL website and drag "binary.txt" to the tree page for visualization.
-2. Or after installing (iTOL API)[https://github.com/iBiology/iTOL], you can use the following command line to upload and annotate your tree:
+2. Or after installing [iTOL API](https://github.com/iBiology/iTOL), you can use the following command line to upload and annotate your tree:
 ```
 itol Evolink_itol_input.zip -i <your iTOL upload API key> -p <project_name>
 ```
