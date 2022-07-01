@@ -12,7 +12,10 @@ from biom.util import biom_open
 from biom.table import Table
 # from tqdm import tqdm
 
-global alpha2CI = {0.80:1.282, 0.85:1.44, 0.9:1.645, 0.95:1.960, 0.99:2.576, 0.995:2.807, 0.997:3.0, 0.999:3.291}
+script_dir = os.path.abspath(os.path.dirname( __file__ ))
+
+alpha2CI = {0.80:1.282, 0.85:1.44, 0.9:1.645, 0.95:1.960, 0.99:2.576, 0.995:2.807, 0.997:3.0, 0.999:3.291}
+
 
 def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree_file):
 
@@ -151,6 +154,7 @@ def iTOL_data(trait_df, gene_df, pos_genes, neg_genes):
 def iTOL_input(tree_file, trait_df, gene_df, df, prefix, pos_top=5, neg_top=5):
     # display_mode:1=rectangular, 2=circular.
     import zipfile
+    
     itol_tree_path = os.path.join(prefix, "input.tree")
     shutil.copy(tree_file, itol_tree_path)
     zip_path = os.path.join(prefix, "Evolink_itol_input.zip")
@@ -159,7 +163,8 @@ def iTOL_input(tree_file, trait_df, gene_df, df, prefix, pos_top=5, neg_top=5):
 
     pos_genes = df[(df["significance"]=="sig") & (df["Evolink_index"] > 0)].sort_values(by='Evolink_index', ascending=False).head(pos_top)["orthoID"].to_list()
     neg_genes = df[(df["significance"]=="sig") & (df["Evolink_index"] < 0)].sort_values(by='Evolink_index').head(neg_top)["orthoID"].to_list()
-    
+
+    sys.path.append(script_dir)
     from iTOL import TOL
     t = TOL(zfile=zip_path, wd=prefix)
     # for each tip, it will have 1 phenotype + pos_top genotypes + neg_top genotypes

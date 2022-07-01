@@ -9,11 +9,29 @@ Phylogenetic information is accepted as a good resource to control for populatio
 
 Tested on a self-made flagella dataset with a large tree (with 1,948 leaves) and a gene family presence/absence matrix (containing 149,316 gene families), Evolink could give results in less than 5 minutes, demonstrating its capability of mining genes correlated to a phenotype on large-scale datasets.
 
+### Prerequisite
+Prepare [Anaconda](https://www.anaconda.com/products/distribution) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html). [Anaconda or Miniconda?](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda)
+Although tests were performed on Linux system, it is likely Evolink could be run on Windows and Mac since conda could be run cross-platform.
+
 ### Installation
+To install Evolink is easy:
+```
+# Step 1. Git clone project
+git clone https://github.com/nlm-irp-jianglab/Evolink.git
+cd Evolink
+# Step 2. Build conda environment
+conda env create -f environment.yml
+# Step 3. Activate Evolink environment
+conda activate Evolink
+# Step 4. Set up R packages
+Rscript setup.R
+```
 
 ### Input
 
+
 ### Output
+
 
 ### Usage
 ```
