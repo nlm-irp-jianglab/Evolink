@@ -17,17 +17,17 @@ Although tests were performed on Linux system, it is likely Evolink could run on
 
 ## Installation
 To install Evolink is easy.
-# Step 1. Git clone project
+- Step 1. Git clone project
 `git clone https://github.com/nlm-irp-jianglab/Evolink.git`
 `cd Evolink`
 
-# Step 2. Build conda environment
+- Step 2. Build conda environment
 `conda env create -f environment.yml`
 
-# Step 3. Activate Evolink environment
+- Step 3. Activate Evolink environment
 `conda activate Evolink`
 
-# Step 4. Set up R packages
+- Step 4. Set up R packages
 `Rscript setup.R`
 
 ## Input
@@ -36,6 +36,7 @@ Evolink takes 3 essential input files:
 > e.g. (species_1:1,(species_2:1,(species_3:1,species_4:1)Internal_1:0.5)Internal_2:0.5)Root:0.1;
 
 2. Trait/Phenotype binary file (tab separated file). The header is a must and should be "Tip" and "Status". Tip column contains the tip names the same as the tree, while Status column contains the presence (1) and absence (0) of the phenotype for each leaf. So far only 1 or 0 is accepted and all leaves should be labeled with a 0/1 status. For example:  
+
 | Tip       | Status |
 |-----------|--------|
 | species_1 | 0      |
@@ -43,7 +44,8 @@ Evolink takes 3 essential input files:
 | species_3 | 1      |
 | species_4 | 0      |
 
-3. Gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene cross all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
+1. Gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene cross all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
+
 | orthoID | species_1 | species_2 | species_3 | species_4 |
 |---------|-----------|-----------|-----------|-----------|
 | gene_1  | 0         | 1         | 1         | 0         |
@@ -106,6 +108,7 @@ python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o outp
 
 ## Output
 - A basic output file from Evolink is named "result.tsv" in the output directory provided by the user. It includes "Evolink_index", "Prevelance_index", "significance" and "z_score".  "Evolink_index" and "significance" are the most useful values. For example:  
+
 | orthoID | Prevalence_index     | Evolink_index        | significance | z_score             |
 |---------|----------------------|----------------------|--------------|---------------------|
 | COG1797 | 0.4759221580503997   | 0.5240778359135583   | sig          | 3.0518889144100863  |
@@ -130,15 +133,15 @@ In addition, we also provided a script "Evolink_plot.R" to individually generate
 
 ### ggtree plot for positively and negatively associated genes
 **Tree_mapping_pos.pdf**
-![ggtree_pos](img/ggtree_pos.jpg)
+![ggtree_pos](../img/ggtree_pos.jpg)
 
 **Tree_mapping_neg.pdf**
-![ggtree_neg](img/ggtree_neg.jpg)
+![ggtree_neg](../img/ggtree_neg.jpg)
 
 ### Evolink plot
 **Evolink.pdf**
-![Evolink_plot](img/Evolink_plot.jpg)
+![Evolink_plot](../img/Evolink_plot.jpg)
 
 ### Manhattan plot
 **Manhattan.pdf**
-![Manhattan_plot](img/Manhattan_plot.jpg)
+![Manhattan_plot](../img/Manhattan_plot.jpg)
