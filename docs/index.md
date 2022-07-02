@@ -169,4 +169,4 @@ b) Or if you have a iTOL subscription API key and have installed [iTOL API](http
 ![Manhattan_plot](images/Manhattan_plot.png)
 
 In addition, we also provided a script "Evolink_plot.R" to individually generate local figures after you get the result from Evolink (i.e. result.tsv):  
-`Rscript --vanilla Evolink_plot.R -g test/gene.tsv -t test/trait.tsv -n test/tree.nwk -r test/output_dir/result.tsv -o test/plot_dir`
+```Rscript --vanilla Evolink_plot.R -g test/gene.tsv -t test/trait.tsv -n test/tree.nwk -r test/output_dir/result.tsv -o test/plot_dir```
