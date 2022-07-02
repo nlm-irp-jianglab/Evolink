@@ -39,22 +39,24 @@ Evolink takes 3 essential input files:
 ``` (species_1:1,(species_2:1,(species_3:1,species_4:1)Internal_1:0.5)Internal_2:0.5)Root:0.1; ```
 
 2. Trait/Phenotype binary file (tab separated file). The header is a must and should be "Tip" and "Status". Tip column contains the tip names the same as the tree, while Status column contains the presence (1) and absence (0) of the phenotype for each leaf. So far only 1 or 0 is accepted and all leaves should be labeled with a 0/1 status. For example:  
-
+<div align="center">
 | Tip       | Status |
 |-----------|--------|
 | species_1 | 0      |
 | species_2 | 1      |
 | species_3 | 1      |
 | species_4 | 0      |
+</div>
 
 3. Gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene cross all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
-
+<div align="center">
 | orthoID | species_1 | species_2 | species_3 | species_4 |
 |---------|-----------|-----------|-----------|-----------|
 | gene_1  | 0         | 1         | 1         | 0         |
 | gene_2  | 1         | 1         | 0         | 0         |
 | gene_3  | 1         | 0         | 1         | 0         |
 | gene_4  | 0         | 1         | 0         | 1         |
+</div>
 
 
 ## Usage
@@ -150,7 +152,7 @@ python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o outp
 1. iTOL website input
 a tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called **Evolink_itol_input.zip** for users to visualize their trees on the [Tree of Life (iTOL)](https://itol.embl.de/).
 
-a) You can simply upload the **input.tree** to iTOL website and drag **binary.txt** to the tree page for visualization.
+a) You can simply upload the **input.tree** to iTOL website and drag **binary.txt** to the tree page for visualization.  
 b) Or after installing [iTOL API](https://github.com/iBiology/iTOL), you can use the following command line to upload and annotate your tree if you have a subscription API key, considering iTOL is not free for batch upload:
 `itol Evolink_itol_input.zip -i <your iTOL upload API key> -p <project_name>`
 
