@@ -112,7 +112,7 @@ optional arguments:
 
 ## Examples
 ---
-1. With binary gene presence/absence table (most common usage) and no plots by default:
+1. With binary gene presence/absence table and no plots by default (the most common usage):
 ```
 python Evolink.py -g test/gene.tsv -t test/trait.tsv -n test/tree.nwk -o output_dir
 ```
@@ -149,9 +149,9 @@ A basic output file from Evolink is named "result.tsv" in the output directory p
 When enabling the plot function (with -v or --visualization option), Evolink provides in the output directory four types of figures:
 
 #### 1) iTOL website input
-a tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called **Evolink_itol_input.zip** for users to visualize their trees on the [Tree of Life (iTOL)](https://itol.embl.de/).  
-a) You can simply upload the **input.tree** to iTOL website and drag **binary.txt** to the tree page for visualization.  
-b) Or after installing [iTOL API](https://github.com/iBiology/iTOL), you can use the following command line to upload and annotate your tree if you have a subscription API key, considering iTOL is not free for batch upload:
+A tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called **Evolink_itol_input.zip** are provided for users to visualize their results on the [Tree of Life (iTOL)](https://itol.embl.de/).  
+a) You can simply upload the **input.tree** to iTOL website and drag **binary.txt** onto the webpage for visualization.  
+b) Or if you have a iTOL subscription API key and have installed [iTOL API](https://github.com/iBiology/iTOL), you can use the following command line to upload and annotate your tree.  
 `itol Evolink_itol_input.zip -i <your iTOL upload API key> -p <project_name>`
 
 #### 2) ggtree plot for positively and negatively associated genes
