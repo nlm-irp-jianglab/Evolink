@@ -8,6 +8,6 @@
 ![Evolink](img/Logo.jpg)
 
 
-## Contents
+# Document
 
 A detailed document is provided here: [Evolink pages](https://nlm-irp-jianglab.github.io/Evolink).
