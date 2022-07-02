@@ -34,29 +34,28 @@ To install Evolink is easy.
 ## Input
 ---
 Evolink takes 3 essential input files:
-1. Species tree (newick format). It is recommneded that the tree is rooted. Internal node names could be omitted.  
+1) Species tree (newick format). It is recommneded that the tree is rooted. Internal node names could be omitted.  
 
 ``` (species_1:1,(species_2:1,(species_3:1,species_4:1)Internal_1:0.5)Internal_2:0.5)Root:0.1; ```
 
-2. Trait/Phenotype binary file (tab separated file). The header is a must and should be "Tip" and "Status". Tip column contains the tip names the same as the tree, while Status column contains the presence (1) and absence (0) of the phenotype for each leaf. So far only 1 or 0 is accepted and all leaves should be labeled with a 0/1 status. For example:  
-<div align="center">
+2) Trait/Phenotype binary file (tab separated file). The header is a must and should be "Tip" and "Status". Tip column contains the tip names the same as the tree, while Status column contains the presence (1) and absence (0) of the phenotype for each leaf. So far only 1 or 0 is accepted and all leaves should be labeled with a 0/1 status. For example:  
+
 | Tip       | Status |
 |-----------|--------|
 | species_1 | 0      |
 | species_2 | 1      |
 | species_3 | 1      |
 | species_4 | 0      |
-</div>
 
-3. Gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene cross all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
-<div align="center">
+
+3) Gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene cross all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
+
 | orthoID | species_1 | species_2 | species_3 | species_4 |
 |---------|-----------|-----------|-----------|-----------|
 | gene_1  | 0         | 1         | 1         | 0         |
 | gene_2  | 1         | 1         | 0         | 0         |
 | gene_3  | 1         | 0         | 1         | 0         |
 | gene_4  | 0         | 1         | 0         | 1         |
-</div>
 
 
 ## Usage
@@ -135,7 +134,7 @@ python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o outp
 
 ## Output
 ---
-- A basic output file from Evolink is named "result.tsv" in the output directory provided by the user. It includes "Evolink_index", "Prevelance_index", "significance" and "z_score".  "Evolink_index" and "significance" are the most useful values. For example:  
+A basic output file from Evolink is named "result.tsv" in the output directory provided by the user. It includes "Evolink_index", "Prevelance_index", "significance" and "z_score".  "Evolink_index" and "significance" are the most useful values. For example:  
 
 | orthoID | Prevalence_index     | Evolink_index        | significance | z_score             |
 |---------|----------------------|----------------------|--------------|---------------------|
@@ -147,29 +146,27 @@ python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o outp
 | COG1804 | 0.21892456915043446  | 0.28915028879254645  | NA           | 1.6838234714241953  |
 
 
-- When enabling the plot function (with -v or --visualization option), Evolink provides in the output directory four types of figures:
+When enabling the plot function (with -v or --visualization option), Evolink provides in the output directory four types of figures:
 
-1. iTOL website input
-a tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called **Evolink_itol_input.zip** for users to visualize their trees on the [Tree of Life (iTOL)](https://itol.embl.de/).
-
+#### 1) iTOL website input
+a tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called **Evolink_itol_input.zip** for users to visualize their trees on the [Tree of Life (iTOL)](https://itol.embl.de/).  
 a) You can simply upload the **input.tree** to iTOL website and drag **binary.txt** to the tree page for visualization.  
 b) Or after installing [iTOL API](https://github.com/iBiology/iTOL), you can use the following command line to upload and annotate your tree if you have a subscription API key, considering iTOL is not free for batch upload:
 `itol Evolink_itol_input.zip -i <your iTOL upload API key> -p <project_name>`
 
-2. ggtree plot for positively and negatively associated genes
+#### 2) ggtree plot for positively and negatively associated genes
 **Tree_mapping_pos.pdf**
 ![ggtree_pos](images/ggtree_pos.png)
-
 **Tree_mapping_neg.pdf**
 ![ggtree_neg](images/ggtree_neg.png)
 
-3. Evolink plot
+#### 3) Evolink plot
 **Evolink.pdf**
 ![Evolink_plot](images/Evolink_plot.png)
 
-4. Manhattan plot
+#### 4) Manhattan plot
 **Manhattan.pdf**
 ![Manhattan_plot](images/Manhattan_plot.png)
 
-In addition, we also provided a script "Evolink_plot.R" to individually generate local figures after you get the result from Evolink (i.e. result.tsv):
+In addition, we also provided a script "Evolink_plot.R" to individually generate local figures after you get the result from Evolink (i.e. result.tsv):  
 `Rscript --vanilla Evolink_plot.R -g test/gene.tsv -t test/trait.tsv -n test/tree.nwk -r test/output_dir/result.tsv -o test/plot_dir`
