@@ -13,8 +13,6 @@ Tested on a self-made flagella dataset with a large tree (with 1,948 leaves) and
 - Install [Anaconda](https://www.anaconda.com/products/distribution) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) -- A distribution of the Python and R programming languages for scientific computing, greatly simplifying package management and deployment.
 - [Anaconda or Miniconda?](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda)
 
-Although tests were performed on Linux system, it is likely Evolink could run on Windows and Mac since anaconda could be run cross-platform.
-
 ## Installation
 To install Evolink is easy.
 - Step 1. Git clone project
@@ -27,7 +25,7 @@ To install Evolink is easy.
 - Step 3. Activate Evolink environment
 `conda activate Evolink`
 
-- Step 4. Set up R packages
+- Step 4. Setup R packages
 `Rscript setup.R`
 
 ## Input
@@ -62,22 +60,33 @@ Evolink is designed to find gene families associated with given trait with the h
 optional arguments:
   -h, --help            show this help message and exit
   -g GENE_TABLE, --genotype GENE_TABLE
-                        Tab-delimited gene presence/absence or copy number table. Columns are gene families, while rows are tip names/species/genomes in the phylogenetic tree. If copy number table is provided, please use -c option so that it will be internally converted to binary table. Presence=1, Absence=0.
+                        Tab-delimited gene presence/absence or copy number table. Columns are 
+                        gene families, while rows are tip names/species/genomes in the 
+                        phylogenetic tree. If copy number table is provided, please use -c option 
+                        so that it will be internally converted to binary table. Presence=1, Absence=0.
   -t TRAIT_TABLE, --phenotype TRAIT_TABLE
-                        Two-column (so far only one trait is allowed each time) tab-delimited trait presence/absence table. The first column is tip names
-                        and the second column is the presence/absence of this trait on the tips/species/genomes. Presence=1, Absence=0.
+                        Two-column (so far only one trait is allowed each time) tab-delimited 
+                        trait presence/absence table. The first column is tip names
+                        and the second column is the presence/absence of this trait on 
+                        the tips/species/genomes. Presence=1, Absence=0.
   -n TREE, --phylogeny TREE
-                        A phylogentic tree in newick format. The tip names should be the same in the gene table and trait table.
-  -c, --copy_number     The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]
+                        A phylogentic tree in newick format. The tip names should be the same in 
+                        the gene table and trait table.
+  -c, --copy_number     The given gene table stores numbers (e.g. gene copy numbers) instead of 
+                        presence/absence binary values. [Default: True]
   -p THRESHOLD, --p_threshold THRESHOLD
-                        Absolute Prevalence index threshold to filter in genes for permutation tests [Range: 0-1; Default: 0.9]
+                        Absolute Prevalence index threshold to filter in genes for permutation 
+                        tests [Range: 0-1; Default: 0.9]
   -e THRESHOLD, --e_threshold THRESHOLD
-                        Absolute Evolink index threshold to filter in genes for permutation tests [Range: 0-1; Default: 0.1]
+                        Absolute Evolink index threshold to filter in genes for permutation 
+                        tests [Range: 0-1; Default: 0.1]
   -a ALPHA, --alpha ALPHA
-                        Tail of area cutoff [Range: 0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999; Default: 0.997]
+                        Tail of area cutoff 
+                        [Range: 0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999; Default: 0.997]
   -v, --visualization   Whether to generate plots
   -N TOP_GENES, --top_genes TOP_GENES
-                        Top positively and negatively associated genes mapped to tree. [Default: 5,5 for top 5 pos genes and top 5 neg genes.]
+                        Top positively and negatively associated genes mapped to tree. 
+                        [Default: 5,5 for top 5 pos genes and top 5 neg genes.]
   -m {1,2}, --display-mode {1,2}
                         Tree display mode. [1: circular, 2: rectangular; Default: 1]
   -f, --force           Force to overwrite output folder. [Default: False]
@@ -133,15 +142,15 @@ In addition, we also provided a script "Evolink_plot.R" to individually generate
 
 ### ggtree plot for positively and negatively associated genes
 **Tree_mapping_pos.pdf**
-![ggtree_pos](../img/ggtree_pos.png)
+![ggtree_pos](https://github.com/nlm-irp-jianglab/Evolink/blob/main/img/ggtree_pos.png)
 
 **Tree_mapping_neg.pdf**
-![ggtree_neg](../img/ggtree_neg.png)
+![ggtree_neg](https://github.com/nlm-irp-jianglab/Evolink/blob/main/img/ggtree_neg.png)
 
 ### Evolink plot
 **Evolink.pdf**
-![Evolink_plot](../img/Evolink_plot.png)
+![Evolink_plot](https://github.com/nlm-irp-jianglab/Evolink/blob/main/img/Evolink_plot.png)
 
 ### Manhattan plot
 **Manhattan.pdf**
-![Manhattan_plot](../img/Manhattan_plot.png)
+![Manhattan_plot](https://github.com/nlm-irp-jianglab/Evolink/blob/main/img/Manhattan_plot.png)
