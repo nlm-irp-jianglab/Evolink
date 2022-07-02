@@ -295,8 +295,8 @@ if __name__ == "__main__":
 
     # Optional Input
     parser.add_argument('-c', '--copy_number', help='The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]', action='store_true', required=False, default=False, dest='CN')
-    parser.add_argument('-p', '--p_threshold', help='Absolute Prevalence index threshold to filter in genes for permutation tests [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
-    parser.add_argument('-e', '--e_threshold', help='Absolute Evolink index threshold to filter in genes for permutation tests [Range: 0-1; Default: 0.1]', required=False, default=0.1, type=float, dest='e_threshold', metavar='THRESHOLD')
+    parser.add_argument('-p', '--p_threshold', help='Absolute Prevalence index threshold to filter genes and get background distribution [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
+    parser.add_argument('-e', '--e_threshold', help='Absolute Evolink index threshold to select significant genes [Range: 0-1; Default: 0.1]', required=False, default=0.1, type=float, dest='e_threshold', metavar='THRESHOLD')
     parser.add_argument('-a', '--alpha', help='Tail of area cutoff [Range: 0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999; Default: 0.997]', choices=[0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999], required=False, default=0.997, type=float, dest='alpha', metavar='ALPHA')
     parser.add_argument('-v', '--visualization', help='Whether to generate plots', action='store_true', required=False, default=False, dest='plot')
     parser.add_argument('-N', '--top_genes', help='Top positively and negatively associated genes mapped to tree. [Default: 5,5 for top 5 pos genes and top 5 neg genes.]', required=False, default='5,5', type=str, dest='top_genes')
