@@ -16,7 +16,7 @@ Tested on a self-made flagella dataset with a large tree (with 1,948 leaves) and
 ## Installation
 To install Evolink is easy.
 - Step 1. Git clone project
-`git clone https://github.com/nlm-irp-jianglab/Evolink.git`
+`git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
 `cd Evolink`
 
 - Step 2. Build conda environment
@@ -53,36 +53,44 @@ Evolink takes 3 essential input files:
 
 ## Usage
 ```
-usage: Evolink.py [-h] -g GENE_TABLE -t TRAIT_TABLE -n TREE [-c] [-p THRESHOLD] [-e THRESHOLD] [-a ALPHA] [-v] [-N TOP_GENES] [-m {1,2}] [-f] -o OUTPUT
+usage: Evolink.py [-h] -g GENE_TABLE -t TRAIT_TABLE -n TREE [-c] 
+[-p THRESHOLD] [-e THRESHOLD] [-a ALPHA] [-v] [-N TOP_GENES] [-m {1,2}] [-f] -o OUTPUT
 
-Evolink is designed to find gene families associated with given trait with the help ofphylogeny information.
+Evolink is designed to find gene families associated with given trait 
+with the help ofphylogeny information.
 
 optional arguments:
   -h, --help            show this help message and exit
   -g GENE_TABLE, --genotype GENE_TABLE
-                        Tab-delimited gene presence/absence or copy number table. Columns are 
-                        gene families, while rows are tip names/species/genomes in the 
-                        phylogenetic tree. If copy number table is provided, please use -c option 
-                        so that it will be internally converted to binary table. Presence=1, Absence=0.
+                        Tab-delimited gene presence/absence or copy number table. 
+                        Columns are gene families, while rows are tip 
+                        names/species/genomes in the phylogenetic tree. 
+                        If copy number table is provided, please use -c option 
+                        so that it will be internally converted to binary table. 
+                        Presence=1, Absence=0.
   -t TRAIT_TABLE, --phenotype TRAIT_TABLE
-                        Two-column (so far only one trait is allowed each time) tab-delimited 
-                        trait presence/absence table. The first column is tip names
-                        and the second column is the presence/absence of this trait on 
-                        the tips/species/genomes. Presence=1, Absence=0.
+                        Two-column (so far only one trait is allowed each time) 
+                        tab-delimited trait presence/absence table. 
+                        The first column is tip names and the second column is 
+                        the presence/absence of this trait on the 
+                        tips/species/genomes. Presence=1, Absence=0.
   -n TREE, --phylogeny TREE
-                        A phylogentic tree in newick format. The tip names should be the same in 
-                        the gene table and trait table.
-  -c, --copy_number     The given gene table stores numbers (e.g. gene copy numbers) instead of 
-                        presence/absence binary values. [Default: True]
+                        A phylogentic tree in newick format. 
+                        The tip names should be the same in the gene table and 
+                        trait table.
+  -c, --copy_number     The given gene table stores numbers (e.g. gene copy numbers) 
+                        instead of presence/absence binary values. 
+                        [Default: True]
   -p THRESHOLD, --p_threshold THRESHOLD
-                        Absolute Prevalence index threshold to filter in genes for permutation 
-                        tests [Range: 0-1; Default: 0.9]
+                        Absolute Prevalence index threshold to filter in genes 
+                        for permutation tests [Range: 0-1; Default: 0.9]
   -e THRESHOLD, --e_threshold THRESHOLD
-                        Absolute Evolink index threshold to filter in genes for permutation 
-                        tests [Range: 0-1; Default: 0.1]
+                        Absolute Evolink index threshold to filter in genes for 
+                        permutation tests [Range: 0-1; Default: 0.1]
   -a ALPHA, --alpha ALPHA
                         Tail of area cutoff 
-                        [Range: 0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999; Default: 0.997]
+                        [Range: 0.8, 0.85, 0.90, 0.95, 0.99, 0.995, 0.997, 0.999; 
+                        Default: 0.997]
   -v, --visualization   Whether to generate plots
   -N TOP_GENES, --top_genes TOP_GENES
                         Top positively and negatively associated genes mapped to tree. 
