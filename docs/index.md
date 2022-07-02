@@ -133,15 +133,15 @@ In addition, we also provided a script "Evolink_plot.R" to individually generate
 
 ### ggtree plot for positively and negatively associated genes
 **Tree_mapping_pos.pdf**
-![ggtree_pos](../img/ggtree_pos.jpg)
+![ggtree_pos](../img/ggtree_pos.png)
 
 **Tree_mapping_neg.pdf**
-![ggtree_neg](../img/ggtree_neg.jpg)
+![ggtree_neg](../img/ggtree_neg.png)
 
 ### Evolink plot
 **Evolink.pdf**
-![Evolink_plot](../img/Evolink_plot.jpg)
+![Evolink_plot](../img/Evolink_plot.png)
 
 ### Manhattan plot
 **Manhattan.pdf**
-![Manhattan_plot](../img/Manhattan_plot.jpg)
+![Manhattan_plot](../img/Manhattan_plot.png)
