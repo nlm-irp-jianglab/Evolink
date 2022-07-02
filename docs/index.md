@@ -34,7 +34,7 @@ To install Evolink is easy.
 ## Input
 ---
 Evolink takes 3 essential input files:
-1) Species tree (newick format). It is recommneded that the tree is rooted. Internal node names could be omitted.  
+1) Species tree (newick format). It is recommneded that the tree is rooted. Internal node names could be omitted. For example:  
 
 ``` (species_1:1,(species_2:1,(species_3:1,species_4:1)Internal_1:0.5)Internal_2:0.5)Root:0.1; ```
 
