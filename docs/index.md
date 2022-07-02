@@ -34,7 +34,8 @@ To install Evolink is easy.
 ## Input
 ---
 Evolink takes 3 essential input files:
-1. Species tree (newick format). It is recommneded that the tree is rooted. Internal node names could be omitted.
+1. Species tree (newick format). It is recommneded that the tree is rooted. Internal node names could be omitted.  
+
 ``` (species_1:1,(species_2:1,(species_3:1,species_4:1)Internal_1:0.5)Internal_2:0.5)Root:0.1; ```
 
 2. Trait/Phenotype binary file (tab separated file). The header is a must and should be "Tip" and "Status". Tip column contains the tip names the same as the tree, while Status column contains the presence (1) and absence (0) of the phenotype for each leaf. So far only 1 or 0 is accepted and all leaves should be labeled with a 0/1 status. For example:  
@@ -45,7 +46,6 @@ Evolink takes 3 essential input files:
 | species_2 | 1      |
 | species_3 | 1      |
 | species_4 | 0      |
-
 
 3. Gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene cross all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
 
