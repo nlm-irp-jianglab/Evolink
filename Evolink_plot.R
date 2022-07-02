@@ -50,7 +50,7 @@ plot_tree <- function(p, gene, genes_list, top_gene_ct=5, color="#FE6D73", name=
     dt <- sapply(dt, as.character)
     rownames(dt) <- dt_n
     dt <- t(dt) %>% as.data.frame()
-    p = gheatmap(p, dt, offset = 0, color="#FEF9EF", width=0.8,
+    p = gheatmap(p, dt, offset = 0, color="#D2D9D4", width=0.8,
             colnames_position="top", 
             colnames_angle=90, colnames_offset_y=0,
             hjust=0, font.size=1.5) +
