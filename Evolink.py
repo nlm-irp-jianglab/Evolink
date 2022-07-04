@@ -281,6 +281,14 @@ def pipeline(args):
     kept_gene_list = kept_gene_df.index.values
     print("[",datetime.datetime.now(),"]","Keep", str(kept_gene_df.shape[0])+"/"+str(df.shape[0]), "genes", flush=True)
 
+    ### Get Evolink index threshold ###
+    if e_threshold:
+        thresh = e_threshold
+        print("[",datetime.datetime.now(),"]","Get Evolink index threshold from user:", thresh, flush=True)
+    else:
+        thresh = np.quantile(np.abs(df.loc[kept_genes, "Evolink_index"]), q=1-alpha)
+        print("[",datetime.datetime.now(),"]","Get Evolink index threshold:", thresh, flush=True)
+
     if permutation_times > 0:
         permutation = True
         print("[",datetime.datetime.now(),"]","Perform permutation test", flush=True)
@@ -311,11 +319,9 @@ def pipeline(args):
             pool.close()
             pool.join()
         sim_res= np.stack(sim_list_arr,axis=0)[:,:,1].T #1 for the 2nd column of result table
-        
-        # sim_thresh = np.quantile(np.abs(sim_res), q=1-alpha) # thresh for Evolink index using simulation data
-        thresh = np.quantile(np.abs(df.loc[kept_genes, "Evolink_index"]), q=1-alpha)
         print()
-        print("[",datetime.datetime.now(),"]","Get Evolink index threshold:", thresh, flush=True)
+
+        # sim_thresh = np.quantile(np.abs(sim_res), q=1-alpha) # thresh for Evolink index using simulation data
         
         evolink_value = df.loc[kept_genes, "Evolink_index"].values
         repeats_array = np.transpose([evolink_value] * permutation_times) # an array of len(evolink_value)*permutation_times length
@@ -323,21 +329,16 @@ def pipeline(args):
         pval = (np.sum(np.less(abs(repeats_array), abs(sim_res)),axis=1)+1)/(permutation_times+1)
         df.loc[kept_genes, "pvalue"] = pval
         # df.loc[kept_genes, "adjusted_pvalue"] = smm.multipletests(df.loc[kept_genes, "pvalue"].values, method=multitest_correction)[1]
+        print("[",datetime.datetime.now(),"]","Get permutation p values", flush=True)
 
     else:
         permutation = False
-        if e_threshold:
-            thresh = e_threshold
-            print("[",datetime.datetime.now(),"]","Get Evolink index threshold from user:", thresh, flush=True)
-        else:
-            # no permutation test, thresh for Evolink index using real data
-            thresh = np.quantile(np.abs(df.loc[kept_genes, "Evolink_index"]), q=1-alpha)
-            print("[",datetime.datetime.now(),"]","Get Evolink index threshold:", thresh, flush=True)
 
         from statsmodels.distributions.empirical_distribution import ECDF
         ecdf = ECDF(np.abs(df.loc[kept_genes, "Evolink_index"]))
         pval = 1 - ecdf(np.abs(df.loc[kept_genes, "Evolink_index"]))
         df.loc[kept_genes, "pvalue"] = pval
+        print("[",datetime.datetime.now(),"]","Get p values", flush=True)
 
     res_df = sig_genes(df, thresh, alpha, permutation)
     sig_gene_ct = res_df[res_df["significance"]=="sig"].shape[0]
