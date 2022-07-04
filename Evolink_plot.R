@@ -16,8 +16,8 @@ option_list = list(
               help="tree file", metavar="character"),
     make_option(c("-r", "--result"), type="character", default="results.tsv", 
               help="Evolink results file", metavar="character"),
-    make_option(c("-c", "--cutoff"), type="double", default=3.0, 
-              help="threshold for Evolink z_score, default is 3.0", metavar="float"),
+    make_option(c("-c", "--cutoff"), type="double", default=NULL, 
+              help="threshold for Evolink index", metavar="float"),
     make_option(c("-a", "--top_pos"), type="integer", default=5, 
               help="Number of top up genes, default is 5", metavar="int"),
     make_option(c("-b", "--top_neg"), type="integer", default=5, 
@@ -35,7 +35,7 @@ tree <- read.tree(opt$tree)
 gene <- read.table(opt$gene, header=T, row.names=1, comment.char="", sep="\t")
 trait <- read.table(opt$trait, header=T)
 res <- read.table(opt$result, header=T, comment.char="", sep="\t")
-CI = opt$cutoff
+cutoff = opt$cutoff
 top_pos = opt$top_pos
 top_neg = opt$top_neg
 outdir = opt$outdir
@@ -119,11 +119,11 @@ plot_data = res %>% mutate(genes=case_when((Evolink_index > 0 & significance == 
                             (Evolink_index < 0 & significance == "sig") ~ "down",
                             TRUE ~ "background"))
 plot_data$x = 1:length(plot_data$Evolink_index)
-std = (plot_data$Evolink_index[1]-0)/plot_data$z_score[1]
+
 p = ggplot(plot_data, aes(x=x, y=abs(Evolink_index), color=genes)) + 
     geom_point(alpha=0.9) + 
     scale_color_manual(breaks=c("up", "down", "background"), values=c("#FE6D73", "#227C9D", "grey")) +
-    geom_hline(yintercept=std*CI, color="black") + 
+    geom_hline(yintercept=cutoff, color="black") + 
     xlab("genes") +
     ylab("absolute(Evolink_index)") + 
     theme_classic()
