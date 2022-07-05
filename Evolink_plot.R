@@ -79,7 +79,7 @@ if(display_mode==1){
 
 ggtree_p <- ggtree(tree, size=0.15, open.angle=30) %<+% trait +
      geom_tippoint(mapping=aes(color=Status), 
-                   size=2, show.legend=TRUE) +
+                   size=0.6, show.legend=TRUE) +
      scale_color_manual(values=c("#ADA9B7", "#FFB844"), name="Phenotype")
 
 if(length(pos_genes)>=1){
