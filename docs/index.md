@@ -132,9 +132,9 @@ python Evolink.py -g test/gene_CN.tsv -c -t test/trait.tsv -n test/tree.nwk -o o
 python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -v
 ```
 
-4. "-N" is to map top nine positively and top eight negatively associated genes in the plot; "-d" is to use circular layout for the tree and "-f" is to force overwrite the output directory if it already exists:
+4. "-N" is to map top nine positively and top eight negatively associated genes in the plot; "-d" is to use circular layout for the tree; "-f" is to force overwrite the output directory if it already exists; "-e" is to custom set a thershold for Evolink_index and pvalue cutoff (alpha) will be calculated accordingly:
 ```
-python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -v -N 9,8 -d 1 -f
+python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o output_dir -f -v -N 9,8 -d 1 -e 0.48
 ```
 
 5. "-s" is to perform permutation test and set permutation times=1000; "-@" is to use 8 threads to speed up the permutation:
@@ -156,7 +156,7 @@ A basic output file from Evolink is named "result.tsv" in the output directory p
 | COG0017 | -0.21711         | -0.20687      | 0.23454 | NA           |
 | COG0574 | 0.94472          | 0.05528       | NA      | NA           |
 
-If pemutation test is performed, an additional column named "permutation_pvalue" will be provided.
+If pemutation test is performed, an additional column named "permutation_pvalue" will be provided. 
 
 When enabling the plot function (with -v or --visualization option), Evolink provides in the output directory four types of figures (see example outputs [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_dir) and [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_perm_dir)):
 
