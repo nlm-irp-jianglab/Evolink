@@ -124,13 +124,13 @@ def simulate_phen(tree_file, phen_file, perm_times, seed=1):
 
     return(sim_df)
 
-def sig_genes(df, thresh, alpha=0.01, permutation=False):
+def sig_genes(df, alpha=0.01, p_alpha=0.01, permutation=False):
     df.reset_index(inplace=True)
     df = df.rename(columns = {'index':'orthoID'})
     if permutation:
-        df['significance'] = np.where(((df["Evolink_index"].abs() > thresh) & (df["pvalue"] < alpha)), "sig", pd.NA)
+        df['significance'] = np.where(((df["pvalue"] < alpha) & (df["permutation_pvalue"] < p_alpha)), "sig", pd.NA)
     else:
-        df['significance'] = np.where((df["Evolink_index"].abs() > thresh), "sig", pd.NA)
+        df['significance'] = np.where((df["pvalue"] < alpha), "sig", pd.NA)
     return(df)
 
 def extract_list(lst, index_list):
@@ -139,7 +139,7 @@ def extract_list(lst, index_list):
 def iTOL_data(trait_df, gene_df, pos_genes, neg_genes):
     # set field annotation
     field_shapes = ",".join(['2'] + ['1']*len(pos_genes) + ['1']*len(neg_genes))
-    field_labels = ",".join(["Trait"] + pos_genes + neg_genes)
+    field_labels = ",".join(["Phenotype"] + pos_genes + neg_genes)
     pos_palette = ['#93003a', '#a62045', '#b73651', '#c84b5e', '#d7606d', '#e4757d', '#ef8a8f', '#f8a1a2', '#ffb7b7', '#ffd0cf']
     len_pos_pal = len(pos_palette)
     neg_palette = ['#00429d', '#2255a0', '#3866a5', '#4d77ac', '#6188b4', '#7699bd', '#8baac6', '#a1bbd1', '#b7ccdc', '#cfdde7']
@@ -148,8 +148,8 @@ def iTOL_data(trait_df, gene_df, pos_genes, neg_genes):
                    + neg_palette*int(len(neg_genes)/len_neg_pal) + neg_palette[:len(neg_genes)%len_neg_pal]) \
     # set legend annotation
     legend_title = "Annotated Tree"
-    legend_position_x = '0'
-    legend_position_y = '1000'
+    legend_position_x = '100'
+    legend_position_y = '100'
     legend_shapes = field_shapes
     legend_labels = field_labels
     legend_colors = field_colors
@@ -210,12 +210,13 @@ def pipeline(args):
     trait_table = args.trait_table
     tree_file = args.tree_file
     CN = args.CN
+    alpha = args.alpha
     p_threshold = args.p_threshold
     e_threshold = args.e_threshold
     permutation_times = args.permutation_times
     threads = args.threads
     seed = args.seed
-    alpha = args.alpha
+    p_alpha = args.p_alpha
     # multitest_correction = args.multitest_correction
     plot = args.plot
     top_genes = args.top_genes
@@ -281,10 +282,20 @@ def pipeline(args):
     kept_gene_list = kept_gene_df.index.values
     print("[",datetime.datetime.now(),"]","Keep", str(kept_gene_df.shape[0])+"/"+str(df.shape[0]), "genes", flush=True)
 
+    ### Get basic p values ####
+    from statsmodels.distributions.empirical_distribution import ECDF
+    ecdf = ECDF(np.abs(df.loc[kept_genes, "Evolink_index"]))
+    pval = 1 - ecdf(np.abs(df.loc[kept_genes, "Evolink_index"]))
+    df.loc[kept_genes, "pvalue"] = pval
+    print("[",datetime.datetime.now(),"]","Get Evolink p values", flush=True)
+
     ### Get Evolink index threshold ###
     if e_threshold:
         thresh = e_threshold
         print("[",datetime.datetime.now(),"]","Get Evolink index threshold from user:", thresh, flush=True)
+        # alpha will be updated based on threshold provided by the user
+        alpha = 1 - ecdf(thresh)
+        print("[",datetime.datetime.now(),"]", "According pvalue threshold (alpha) is", alpha, flush=True)
     else:
         thresh = np.quantile(np.abs(df.loc[kept_genes, "Evolink_index"]), q=1-alpha)
         print("[",datetime.datetime.now(),"]","Get Evolink index threshold:", thresh, flush=True)
@@ -327,20 +338,14 @@ def pipeline(args):
         repeats_array = np.transpose([evolink_value] * permutation_times) # an array of len(evolink_value)*permutation_times length
 
         pval = (np.sum(np.less(abs(repeats_array), abs(sim_res)),axis=1)+1)/(permutation_times+1)
-        df.loc[kept_genes, "pvalue"] = pval
+        df.loc[kept_genes, "permutation_pvalue"] = pval
         # df.loc[kept_genes, "adjusted_pvalue"] = smm.multipletests(df.loc[kept_genes, "pvalue"].values, method=multitest_correction)[1]
         print("[",datetime.datetime.now(),"]","Get permutation p values", flush=True)
 
     else:
         permutation = False
 
-        from statsmodels.distributions.empirical_distribution import ECDF
-        ecdf = ECDF(np.abs(df.loc[kept_genes, "Evolink_index"]))
-        pval = 1 - ecdf(np.abs(df.loc[kept_genes, "Evolink_index"]))
-        df.loc[kept_genes, "pvalue"] = pval
-        print("[",datetime.datetime.now(),"]","Get p values", flush=True)
-
-    res_df = sig_genes(df, thresh, alpha, permutation)
+    res_df = sig_genes(df, alpha, p_alpha, permutation)
     sig_gene_ct = res_df[res_df["significance"]=="sig"].shape[0]
     print("[",datetime.datetime.now(),"]","Find", sig_gene_ct, "significant genes", flush=True)
     
@@ -353,7 +358,7 @@ def pipeline(args):
     if plot:
         print("[",datetime.datetime.now(),"]","Generate figures", flush=True)
         iTOL_input(tree_file, trait_df, gene_df, res_df, output, pos_top, neg_top)
-        plot_fig(gene_table, trait_table, tree_file, output, thresh, pos_top, neg_top, display_mode)
+        plot_fig(gene_table, trait_table, tree_file, output, alpha, pos_top, neg_top, display_mode)
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
@@ -367,14 +372,15 @@ if __name__ == "__main__":
 
     # Optional Input
     parser.add_argument('-c', '--copy_number', help='The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]', action='store_true', required=False, default=False, dest='CN')
+    parser.add_argument('-a', '--alpha', help='Pvalue threshold [Default:0.01]', required=False, type=float, default=0.01, dest='alpha', metavar='ALPHA')
     parser.add_argument('-p', '--p_threshold', help='Absolute Prevalence index threshold to filter genes and get Evolink index distribution [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
-    parser.add_argument('-e', '--e_threshold', help='Absolute Evolink index threshold to select significant genes [Range: 0-1; Default: NULL]', required=False, default=None, type=float, dest='e_threshold', metavar='THRESHOLD')
+    parser.add_argument('-e', '--e_threshold', help='Absolute Evolink index threshold to select significant genes. Notice: P-value cutoff (alpha) will be updated based on this option [Range: 0-1; Default: NULL]', required=False, default=None, type=float, dest='e_threshold', metavar='THRESHOLD')
     
     # Simulation Options
     parser.add_argument('-s', '--simulation_times', help='Need to permutation test and set the simulation times [Range: 0-10000]. Default is 0 and no permutation is performed.', required=False, type=int, default=0, dest='permutation_times', metavar='PERM_TIMES')
     parser.add_argument('-@', '--threads', help='Threads for permutation test [Default: 4]', required=False, default=4, type=int, dest='threads', metavar='THREADS')
     parser.add_argument('-r', '--seed', help='Set seed for simulation for reproducibility of the results [Default: 1]', required=False, default=1, type=int, dest='seed', metavar='SEED')
-    parser.add_argument('-a', '--alpha', help='P value threshold [Default:0.01]', required=False, type=float, default=0.01, dest='alpha', metavar='ALPHA')
+    parser.add_argument('-b', '--permutation_alpha', help='Permutation pvalue threshold [Default:0.01]', required=False, type=float, default=0.01, dest='p_alpha', metavar='PERMUTATION_ALPHA')
     # parser.add_argument('-m', '--multitest_correction', help='Multitest correction [Choices: bonferroni, fdr_bh, holm, hommel; Default: bonferroni]', choices = ["bonferroni", "fdr_bh", "holm", "hommel"], required=False, type=str, default="bonferroni", dest='multitest_correction', metavar='MT_CORR')
     
     # Plot Options

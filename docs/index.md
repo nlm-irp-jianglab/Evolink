@@ -156,6 +156,7 @@ A basic output file from Evolink is named "result.tsv" in the output directory p
 | COG0017 | -0.21711         | -0.20687      | 0.23454 | NA           |
 | COG0574 | 0.94472          | 0.05528       | NA      | NA           |
 
+If pemutation test is performed, an additional column named "permutation_pvalue" will be provided.
 
 When enabling the plot function (with -v or --visualization option), Evolink provides in the output directory four types of figures (see example outputs [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_dir) and [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_perm_dir)):
 

@@ -115,19 +115,20 @@ ggsave(evolink_plot_path, device="pdf", width=15, height=10, units="cm")
 print(paste("Generate", evolink_plot_path, "done."))
 
 # 3. Manhattan plot
-plot_data = res %>% mutate(genes=case_when((Evolink_index > 0 & significance == "sig") ~ "up",
+plot_data = res %>% filter(!is.na(pvalue)) %>% mutate(genes=case_when((Evolink_index > 0 & significance == "sig") ~ "up",
                             (Evolink_index < 0 & significance == "sig") ~ "down",
                             TRUE ~ "background"))
 plot_data$x = 1:length(plot_data$Evolink_index)
 
-p = ggplot(plot_data, aes(x=x, y=abs(Evolink_index), color=genes)) + 
+plot_data$pvalue_plot = abs(jitter(plot_data$pvalue))
+p = ggplot(plot_data, aes(x=x, y=-log10(pvalue_plot), color=genes)) + 
     geom_point(alpha=0.9) + 
     scale_color_manual(breaks=c("up", "down", "background"), values=c("#FE6D73", "#227C9D", "grey")) +
-    geom_hline(yintercept=cutoff, color="black") + 
+    geom_hline(yintercept=-log10(cutoff), color="black") + 
     xlab("genes") +
-    ylab("absolute(Evolink_index)") + 
+    ylab(expression("-log"[10]*"(Pvalue)")) + 
     theme_classic()
 
 manhattan_plot_path = file.path(outdir, "Manhattan.pdf")
-ggsave(manhattan_plot_path, device="pdf", width=20, height=10, units="cm")
+ggsave(manhattan_plot_path, device="pdf", width=20, height=12, units="cm")
 print(paste("Generate", manhattan_plot_path, "done."))
