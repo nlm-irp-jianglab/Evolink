@@ -13,7 +13,6 @@ from biom.table import Table
 from tqdm import tqdm
 
 script_dir = os.path.abspath(os.path.dirname( __file__ ))
-pvalue2zscore = {0.80:1.282, 0.85:1.44, 0.9:1.645, 0.95:1.960, 0.99:2.576, 0.995:2.807, 0.997:3.0, 0.999:3.291}
 
 def Evolink_calculation(trait_matrix, gene_matrix, species_list, gene_list, tree_file):
 
