@@ -1,10 +1,8 @@
-test_flagella/
-simData/
-simData_2/
-test_INT1848/
-test_INT58/
+test_data/cmd.sh
+test_data/mapping
+test/
+test_flagella_GTDB/
 scripts/
 test_flagella_WOL/
-test_INT3449/
 test_sporulation_WOL/
 archives/

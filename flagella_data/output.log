@@ -1,0 +1,15 @@
+nohup: ignoring input
+[ 2022-08-29 21:23:25.819294 ] Read trait data
+[ 2022-08-29 21:23:25.825966 ] Read gene data
+[ 2022-08-29 21:23:49.178106 ] Calculate Evolink index
+[ 2022-08-29 21:26:13.283907 ] Running gesd_test mode to detect significant genes
+[ 2022-08-29 21:26:13.284016 ] Filter genes
+[ 2022-08-29 21:26:13.384017 ] Keep 4185/149316 genes
+[ 2022-08-29 21:26:17.562574 ] Find 44 significant genes
+[ 2022-08-29 21:26:17.562653 ] Output result
+[ 2022-08-29 21:26:18.303750 ] Generate figures
+[ 2022-08-29 21:26:18.387324 ] iTOL inputs generated at Evolink_output/Evolink_itol_input.zip
+Run plot command line: Rscript --vanilla /gpfs/gsfs12/users/yangy34/projects/Evolink/Evolink_plot.R -m gesd_test -g gene.tsv -t trait.tsv -n tree.nwk -r Evolink_output/result.tsv -c 0.1 -a 5 -b 5 -d 1 -o Evolink_output
+[1] "Generate Evolink_output/Positive_genotypes_ggtree_plot.pdf done."
+[1] "Generate Evolink_output/Evolink_plot.pdf done."
+[1] "Generate Evolink_output/Manhattan_plot.pdf done."
