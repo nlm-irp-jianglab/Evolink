@@ -1,6 +1,6 @@
-test_data/cmd.sh
-test_data/mapping
+test_data/archives/
 test/
+flagella_data/
 test_flagella_GTDB/
 scripts/
 test_flagella_WOL/
