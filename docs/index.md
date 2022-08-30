@@ -198,17 +198,17 @@ b) Or if you have a iTOL subscription API key and have installed [iTOL API](http
 `itol Evolink_itol_input.zip -i <your iTOL upload API key> -p <project_name>`
 
 #### 2) ggtree plot for positively and negatively associated genotypes
-**Tree_mapping_pos.pdf**
+**Positive_genotypes_ggtree_plot.pdf**
 ![ggtree_pos](images/Pos_genotypes_ggtree_plot.jpg)
-**Tree_mapping_neg.pdf**
+**Negative_genotypes_ggtree_plot.pdf**
 ![ggtree_neg](images/Neg_genotypes_ggtree_plot.jpg)
 
 #### 3) Evolink plot
-**Evolink.pdf**
+**Evolink_plot.pdf**
 ![Evolink_plot](images/Evolink_plot.jpg)
 
 #### 4) Manhattan plot
-**Manhattan.pdf**
+**Manhattan_plot.pdf**
 ![Manhattan_plot](images/Manhattan_plot.jpg)
 
 In addition, we also provided a script "Evolink_plot.R" to individually generate local figures after you get the result from Evolink (i.e. result.tsv):  
