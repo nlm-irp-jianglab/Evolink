@@ -150,6 +150,11 @@ optional arguments:
 
 ## Examples
 ---
+0. Unzip test data first
+```
+unzip test_data/test_data.zip
+```
+
 1. With binary gene presence/absence table and no plots by default (the most common usage):
 ```
 python Evolink.py -g test_data/gene.tsv -t test_data/trait.tsv -n test_data/tree.nwk -o output_dir
