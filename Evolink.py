@@ -232,7 +232,8 @@ def pipeline(args):
     # threads = args.threads
 
     # Z-score mode
-    alpha = args.alpha
+    # alpha = args.alpha
+    z_score_threshold = args.z_score_threshold
 
     # IsolationForest mode #
     outlier_score_threshold = args.outlier_score_threshold
@@ -351,14 +352,21 @@ def pipeline(args):
 
         else:
         ##### 3. Z-score mode start #####
-            import scipy.stats
-            # get Z-score threshold
-            # ppf() takes a percentage and returns a standard deviation multiplier for what value that percentage occurs at
-            Z_alpha_2 = scipy.stats.norm.ppf(1-alpha/2)
-            sd = df.loc[kept_genes, "Evolink_index"].std()
+            ### classic z-score ###
+            # import scipy.stats
+            # # get Z-score threshold
+            # # ppf() takes a percentage and returns a standard deviation multiplier for what value that percentage occurs at
+            # Z_alpha_2 = scipy.stats.norm.ppf(1-alpha/2)
+            # sd = df.loc[kept_genes, "Evolink_index"].std()
+            # df["significance"] = pd.NA
+            # df.loc[kept_genes, "z_score"] = df.loc[kept_genes, "Evolink_index"]/sd
+            # df.loc[kept_genes, "significance"] = np.where((df.loc[kept_genes, "z_score"].abs() >  Z_alpha_2), "sig", pd.NA)
+            
+            ### modified z-score ###
+            mad = df.loc[kept_genes, "Evolink_index"].mad()
             df["significance"] = pd.NA
-            df.loc[kept_genes, "z_score"] = df.loc[kept_genes, "Evolink_index"]/sd
-            df.loc[kept_genes, "significance"] = np.where((df.loc[kept_genes, "z_score"].abs() >  Z_alpha_2), "sig", pd.NA)
+            df.loc[kept_genes, "modified_z_score"] = (df.loc[kept_genes, "Evolink_index"]*0.6745)/mad
+            df.loc[kept_genes, "significance"] = np.where((df.loc[kept_genes, "modified_z_score"].abs() >  z_score_threshold), "sig", pd.NA)
         ##### Z-score mode end #####
 
     elif mode == "isolation_forest":
@@ -421,7 +429,7 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--phylogeny', help='A phylogentic tree in newick format. The tip names should be the same in the gene table and trait table.',required=True, dest='tree_file', metavar='TREE')
 
     # Optional Input
-    parser.add_argument('-m', '--mode', help='Evolink has 4 modes to detect siginificant genotypes assoicated with phenotype: gesd_test, isolation_forest, permutation, z_score and cutoff. Running time: permutation > isolation_forest > gesd_test > z_score > cutoff', required=False, default='gesd_test', dest='mode', choices=["gesd_test", "isolation_forest", "permutation", "z_score", "cutoff"] , metavar='MODE')
+    parser.add_argument('-m', '--mode', help='Evolink has four modes insofar to detect phenotype-assoicated genotypes: gesd_test, isolation_forest, (modified) z_score, and cutoff. Running time: isolation_forest > gesd_test > z_score > cutoff. [Choices: gesd_test, isolation_forest, z_score, cutoff; Default: gesd_test]', required=False, default='gesd_test', dest='mode', choices=["gesd_test", "isolation_forest", "z_score", "cutoff"] , metavar='MODE')
     parser.add_argument('-c', '--copy-number', help='The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]', action='store_true', required=False, default=False, dest='CN')
     parser.add_argument('-p', '--p-threshold', help='Absolute Prevalence index threshold to filter genes and get Evolink index distribution [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
     parser.add_argument('-r', '--seed', help='Set seed for simulation for reproducibility of the results [Default: 1]', required=False, default=1, type=int, dest='seed', metavar='SEED')
@@ -431,32 +439,33 @@ if __name__ == "__main__":
     parser.add_argument('--gesd-pval-threshold', help='Original p-value threshold [Default:0.1]', required=False, type=float, default=0.1, dest='gesd_pval_threshold', metavar='THRESHOLD')
     parser.add_argument('--gesd-padj-threshold', help='Adjusted p-value threshold [Default:0.2]', required=False, type=float, default=0.2, dest='gesd_padj_threshold', metavar='THRESHOLD')
 
-    # Cutoff Mode Option
-    parser.add_argument('-e', '--e-threshold', help='Absolute Evolink index threshold to select significant genes. [Range: 0-1; Default: 0.375]', required=False, default=0.375, type=float, dest='e_threshold', metavar='THRESHOLD')
-
     # Isolation Forest Mode Options
     parser.add_argument('--outlier-score-threshold', help='A threshold to determine outliers by IsolationForest [Default: 0.8; Range: 0.5-1]', required=False, default=0.8, type=float, dest='outlier_score_threshold', metavar='THRESHOLD')
     parser.add_argument('--n-estimators', help='Number of tree estimators used in IsolationForest [Default: 200]', required=False, type=int, default=200, dest='n_estimators', metavar='NUMBER')
     parser.add_argument('--max-samples', help='Percentage of training samples for each tree in IsolationForest [Default: 0.1]', required=False, type=float, default=0.1, dest='max_samples', metavar='PERCENTAGE')
     # parser.add_argument('--slope-cutoff', help='A slope cutoff to find the plateau of the IsolationForest score curve [Default: -0.001]', required=False, default=-0.01, type=float, dest='slope_cutoff', metavar='THRESHOLD')
     # parser.add_argument('--threshold-interval', help='The interval/resolution to find the best threshold in IsolationForest scores [Default: 0.005]', required=False, default=0.005, type=float, dest='threshold_interval', metavar='INTERVAL')
+
+    # (modified) Z-score Mode Option
+    # parser.add_argument('-a', '--alpha', help='Alpha threshold [Default:0.001; Range: 0.1-0.0001]', required=False, type=float, default=0.001, dest='alpha', metavar='ALPHA')
+    parser.add_argument('-z', '--z-score-threshold', help='Absolute modified z-score threshold [Default:3.5]', required=False, type=float, default=3.5, dest='z_score_threshold', metavar='THRESHOLD')
     
+    # Cutoff Mode Option
+    parser.add_argument('-e', '--e-threshold', help='Absolute Evolink index threshold to select significant genes. [Range: 0-1; Default: 0.375]', required=False, default=0.375, type=float, dest='e_threshold', metavar='THRESHOLD')
+
     # Permutation Mode Options
     parser.add_argument('--fold-times', help='Simulate N*the bumber of genotype input provided by users after filtering (namely simulate N*nrow(gene matrix after filtering) times) [Default: 10]', required=False, default=10, type=int, dest='fold_times', metavar='FOLD_TIMES')
     parser.add_argument('--perm-mc-method', help='Multitest correction method [Choices: bonferroni, fdr_bh, holm, hommel; Default: fdr_bh]', choices = ["fdr_bh", "bonferroni", "holm", "hommel"], required=False, type=str, default="fdr_bh", dest='perm_mc_method', metavar='METHOD')
     parser.add_argument('--perm-padj-threshold', help='Adjusted p-value threshold [Default:0.001]', required=False, type=float, default=0.001, dest='perm_padj_threshold', metavar='THRESHOLD')
     # parser.add_argument('-@', '--threads', help='Threads for permutation test [Default: 4]', required=False, default=4, type=int, dest='threads', metavar='THREADS')
 
-    # Z-score Mode Option => modified z-score?
-    parser.add_argument('-a', '--alpha', help='Alpha threshold [Default:0.001; Range: 0.1-0.0001]', required=False, type=float, default=0.001, dest='alpha', metavar='ALPHA')
-    
     # Plot Options
     parser.add_argument('-v', '--visualization', help='Whether to generate plots', action='store_true', required=False, default=False, dest='plot')
     parser.add_argument('-N', '--top-genes', help='Top positively and negatively associated genes mapped to tree. [Default: 5,5 for top 5 pos genes and top 5 neg genes.]', required=False, default='5,5', type=str, dest='top_genes')
     parser.add_argument('-d', '--display-mode', help='Tree display mode. [1: circular, 2: rectangular; Default: 1]', type=int, choices=[1, 2], required=False, default=1, dest='display_mode')
-    parser.add_argument('-f', '--force', help='Force to overwrite output folder. [Default: False]', action='store_true', required=False, default=False, dest='force')
     
     # Output
+    parser.add_argument('-f', '--force', help='Force to overwrite output folder. [Default: False]', action='store_true', required=False, default=False, dest='force')
     parser.add_argument('-o', '--output', help='output directory', required=True, dest='output', metavar='OUTPUT')
     
     args = parser.parse_args()

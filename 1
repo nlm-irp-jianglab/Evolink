@@ -1,0 +1,87 @@
+usage: Evolink.py [-h] -g GENE_TABLE -t TRAIT_TABLE -n TREE [-m MODE] [-c]
+                  [-p THRESHOLD] [-r SEED] [--gesd-mc-method METHOD]
+                  [--gesd-pval-threshold THRESHOLD]
+                  [--gesd-padj-threshold THRESHOLD]
+                  [--outlier-score-threshold THRESHOLD]
+                  [--n-estimators NUMBER] [--max-samples PERCENTAGE]
+                  [-z THRESHOLD] [-e THRESHOLD] [--fold-times FOLD_TIMES]
+                  [--perm-mc-method METHOD] [--perm-padj-threshold THRESHOLD]
+                  [-v] [-N TOP_GENES] [-d {1,2}] [-f] -o OUTPUT
+
+Evolink is designed to find gene families associated with trait by explicitly
+using phylogeny information.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -g GENE_TABLE, --genotype GENE_TABLE
+                        Tab-delimited gene presence/absence or copy number
+                        table. Columns are gene families, while rows are tip
+                        names/species/genomes in the phylogenetic tree. If
+                        copy number table is provided, please use -c option so
+                        that it will be internally converted to binary table.
+                        Presence=1, Absence=0.
+  -t TRAIT_TABLE, --phenotype TRAIT_TABLE
+                        Two-column (so far only one trait is allowed each
+                        time) tab-delimited trait presence/absence table. The
+                        first column is tip names and the second column is the
+                        presence/absence of this trait on the
+                        tips/species/genomes. Presence=1, Absence=0.
+  -n TREE, --phylogeny TREE
+                        A phylogentic tree in newick format. The tip names
+                        should be the same in the gene table and trait table.
+  -m MODE, --mode MODE  Evolink has four modes insofar to detect phenotype-
+                        assoicated genotypes: gesd_test, isolation_forest,
+                        (modified) z_score, and cutoff. Running time:
+                        isolation_forest > gesd_test > z_score > cutoff.
+                        [Choices: gesd_test, isolation_forest, z_score,
+                        cutoff; Default: gesd_test]
+  -c, --copy-number     The given gene table stores numbers (e.g. gene copy
+                        numbers) instead of presence/absence binary values.
+                        [Default: True]
+  -p THRESHOLD, --p-threshold THRESHOLD
+                        Absolute Prevalence index threshold to filter genes
+                        and get Evolink index distribution [Range: 0-1;
+                        Default: 0.9]
+  -r SEED, --seed SEED  Set seed for simulation for reproducibility of the
+                        results [Default: 1]
+  --gesd-mc-method METHOD
+                        Multitest correction method [Choices: none,
+                        bonferroni, fdr, holm, hommel; Default: none]
+  --gesd-pval-threshold THRESHOLD
+                        Original p-value threshold [Default:0.1]
+  --gesd-padj-threshold THRESHOLD
+                        Adjusted p-value threshold [Default:0.2]
+  --outlier-score-threshold THRESHOLD
+                        A threshold to determine outliers by IsolationForest
+                        [Default: 0.8; Range: 0.5-1]
+  --n-estimators NUMBER
+                        Number of tree estimators used in IsolationForest
+                        [Default: 200]
+  --max-samples PERCENTAGE
+                        Percentage of training samples for each tree in
+                        IsolationForest [Default: 0.1]
+  -z THRESHOLD, --z-score-threshold THRESHOLD
+                        Absolute modified z-score threshold [Default:3.5]
+  -e THRESHOLD, --e-threshold THRESHOLD
+                        Absolute Evolink index threshold to select significant
+                        genes. [Range: 0-1; Default: 0.375]
+  --fold-times FOLD_TIMES
+                        Simulate N*the bumber of genotype input provided by
+                        users after filtering (namely simulate N*nrow(gene
+                        matrix after filtering) times) [Default: 10]
+  --perm-mc-method METHOD
+                        Multitest correction method [Choices: bonferroni,
+                        fdr_bh, holm, hommel; Default: fdr_bh]
+  --perm-padj-threshold THRESHOLD
+                        Adjusted p-value threshold [Default:0.001]
+  -v, --visualization   Whether to generate plots
+  -N TOP_GENES, --top-genes TOP_GENES
+                        Top positively and negatively associated genes mapped
+                        to tree. [Default: 5,5 for top 5 pos genes and top 5
+                        neg genes.]
+  -d {1,2}, --display-mode {1,2}
+                        Tree display mode. [1: circular, 2: rectangular;
+                        Default: 1]
+  -f, --force           Force to overwrite output folder. [Default: False]
+  -o OUTPUT, --output OUTPUT
+                        output directory

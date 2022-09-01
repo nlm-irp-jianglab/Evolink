@@ -63,12 +63,12 @@ Evolink takes 3 essential input files:
 usage: Evolink.py [-h] -g GENE_TABLE -t TRAIT_TABLE -n TREE [-m MODE] [-c]
                   [-p THRESHOLD] [-r SEED] [--gesd-mc-method METHOD]
                   [--gesd-pval-threshold THRESHOLD]
-                  [--gesd-padj-threshold THRESHOLD] [-e THRESHOLD]
+                  [--gesd-padj-threshold THRESHOLD]
                   [--outlier-score-threshold THRESHOLD]
                   [--n-estimators NUMBER] [--max-samples PERCENTAGE]
-                  [--fold-times FOLD_TIMES] [--perm-mc-method METHOD]
-                  [--perm-padj-threshold THRESHOLD] [-a ALPHA] [-v]
-                  [-N TOP_GENES] [-d {1,2}] [-f] -o OUTPUT
+                  [-z THRESHOLD] [-e THRESHOLD] [--fold-times FOLD_TIMES]
+                  [--perm-mc-method METHOD] [--perm-padj-threshold THRESHOLD]
+                  [-v] [-N TOP_GENES] [-d {1,2}] [-f] -o OUTPUT
 
 Evolink is designed to find gene families associated with trait by explicitly
 using phylogeny information.
@@ -91,11 +91,12 @@ optional arguments:
   -n TREE, --phylogeny TREE
                         A phylogentic tree in newick format. The tip names
                         should be the same in the gene table and trait table.
-  -m MODE, --mode MODE  Evolink has 4 modes to detect siginificant genotypes
-                        assoicated with phenotype: gesd_test,
-                        isolation_forest, permutation, z_score and cutoff.
-                        Running time: permutation > isolation_forest >
-                        gesd_test > z_score > cutoff
+  -m MODE, --mode MODE  Evolink has four modes insofar to detect phenotype-
+                        assoicated genotypes: gesd_test, isolation_forest,
+                        (modified) z_score, and cutoff. Running time:
+                        isolation_forest > gesd_test > z_score > cutoff.
+                        [Choices: gesd_test, isolation_forest, z_score,
+                        cutoff; Default: gesd_test]
   -c, --copy-number     The given gene table stores numbers (e.g. gene copy
                         numbers) instead of presence/absence binary values.
                         [Default: True]
@@ -112,9 +113,6 @@ optional arguments:
                         Original p-value threshold [Default:0.1]
   --gesd-padj-threshold THRESHOLD
                         Adjusted p-value threshold [Default:0.2]
-  -e THRESHOLD, --e-threshold THRESHOLD
-                        Absolute Evolink index threshold to select significant
-                        genes. [Range: 0-1; Default: 0.375]
   --outlier-score-threshold THRESHOLD
                         A threshold to determine outliers by IsolationForest
                         [Default: 0.8; Range: 0.5-1]
@@ -124,6 +122,11 @@ optional arguments:
   --max-samples PERCENTAGE
                         Percentage of training samples for each tree in
                         IsolationForest [Default: 0.1]
+  -z THRESHOLD, --z-score-threshold THRESHOLD
+                        Absolute modified z-score threshold [Default:3.5]
+  -e THRESHOLD, --e-threshold THRESHOLD
+                        Absolute Evolink index threshold to select significant
+                        genes. [Range: 0-1; Default: 0.375]
   --fold-times FOLD_TIMES
                         Simulate N*the bumber of genotype input provided by
                         users after filtering (namely simulate N*nrow(gene
@@ -133,8 +136,6 @@ optional arguments:
                         fdr_bh, holm, hommel; Default: fdr_bh]
   --perm-padj-threshold THRESHOLD
                         Adjusted p-value threshold [Default:0.001]
-  -a ALPHA, --alpha ALPHA
-                        Alpha threshold [Default:0.001; Range: 0.1-0.0001]
   -v, --visualization   Whether to generate plots
   -N TOP_GENES, --top-genes TOP_GENES
                         Top positively and negatively associated genes mapped
