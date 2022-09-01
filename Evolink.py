@@ -432,7 +432,7 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--mode', help='Evolink has four modes insofar to detect phenotype-assoicated genotypes: gesd_test, isolation_forest, (modified) z_score, and cutoff. Running time: isolation_forest > gesd_test > z_score > cutoff. [Choices: gesd_test, isolation_forest, z_score, cutoff; Default: gesd_test]', required=False, default='gesd_test', dest='mode', choices=["gesd_test", "isolation_forest", "z_score", "cutoff"] , metavar='MODE')
     parser.add_argument('-c', '--copy-number', help='The given gene table stores numbers (e.g. gene copy numbers) instead of presence/absence binary values. [Default: True]', action='store_true', required=False, default=False, dest='CN')
     parser.add_argument('-p', '--p-threshold', help='Absolute Prevalence index threshold to filter genes and get Evolink index distribution [Range: 0-1; Default: 0.9]', required=False, default=0.9, type=float, dest='p_threshold', metavar='THRESHOLD')
-    parser.add_argument('-r', '--seed', help='Set seed for simulation for reproducibility of the results [Default: 1]', required=False, default=1, type=int, dest='seed', metavar='SEED')
+    parser.add_argument('-s', '--seed', help='Set seed for simulation for reproducibility of the results [Default: 1]', required=False, default=1, type=int, dest='seed', metavar='SEED')
     
     # Gesd Test Mode Options
     parser.add_argument('--gesd-mc-method', help='Multitest correction method [Choices: none, bonferroni, fdr, holm, hommel; Default: none]', choices = ["none", "fdr_bh", "bonferroni", "holm", "hommel"], required=False, type=str, default="none", dest='gesd_mc_method', metavar='METHOD')

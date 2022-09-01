@@ -104,7 +104,7 @@ optional arguments:
                         Absolute Prevalence index threshold to filter genes
                         and get Evolink index distribution [Range: 0-1;
                         Default: 0.9]
-  -r SEED, --seed SEED  Set seed for simulation for reproducibility of the
+  -s SEED, --seed SEED  Set seed for simulation for reproducibility of the
                         results [Default: 1]
   --gesd-mc-method METHOD
                         Multitest correction method [Choices: none,
