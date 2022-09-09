@@ -25,6 +25,16 @@ To install Evolink is easy.
 - Step 2. Build conda environment  
 `conda env create -f environment.yml`
 
+- Alternative for Step 2
+To expereince a much faster installation:
+Please install [mamba](https://mamba.readthedocs.io/en/latest/installation.html) first.
+If you use Linux, install mamba is very easy:
+`wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`
+`bash Mambaforge-$(uname)-$(uname -m).sh`
+
+and then build environment
+`mamba env create -f environment.yml`
+
 - Step 3. Activate Evolink environment  
 `conda activate Evolink`
 
