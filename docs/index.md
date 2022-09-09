@@ -10,16 +10,14 @@ Phylogenetic information is accepted as a good resource to control for populatio
 
 Tested on a flagella dataset with a large tree (with 1,948 leaves) and a gene family presence/absence matrix (containing 149,316 gene families), Evolink could give results in less than 5 minutes, demonstrating its capability of mining genotypes correlated to a phenotype on large-scale datasets.
 
-## Requirement
----
-- Install [Anaconda](https://www.anaconda.com/products/distribution) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) -- A distribution of the Python and R programming languages for scientific computing, greatly simplifying package management and deployment.
-- [Anaconda or Miniconda?](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda)
-
 ## Installation
 ---
 To install Evolink is easy and you have three choices.
 
 ### Use Conda
+- Install [Anaconda](https://www.anaconda.com/products/distribution) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) first. They are distributions of the Python and R programming languages for scientific computing, greatly simplifying package management and deployment.
+- [Anaconda or Miniconda?](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda)
+
 - Step 1. Git clone project  
 `git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
 `cd Evolink`
@@ -48,10 +46,10 @@ The installation is very similar to using conda.
 - Step 2. Build mamba environment  
 `mamba env create -f environment.yml`
 
-- Step 3. Activate Evolink environment  
+- Step 3. Activate Evolink environment   
 `conda activate Evolink`
 
-- Step 4. Setup required R packages
+- Step 4. Setup required R packages  
 `Rscript setup.R`
 
 ### Use Docker
