@@ -34,11 +34,11 @@ To install Evolink is easy and you have three choices.
 ### Use Mamba
 To expereince a much faster installation:
 Please install [mamba](https://mamba.readthedocs.io/en/latest/installation.html) first.
-If you use Linux, install mamba is very easy:
+If you use Linux, install mamba is very easy:  
 `wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`
 `bash Mambaforge-$(uname)-$(uname -m).sh`
 
-The installation is very similar to using conda.
+The installation is very similar to using conda.  
 - Step 1. Git clone project  
 `git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
 `cd Evolink`
@@ -53,12 +53,12 @@ The installation is very similar to using conda.
 `Rscript setup.R`
 
 ### Use Docker
-Running Evolink using a docker is also an option.
+Running Evolink using a [docker](https://docs.docker.com/engine/install/) is also an option.
 
-- Step 1. Pull the docker
+- Step 1. Pull the docker  
 `docker pull nlmirpjianglab/evolink`
 
-- Step 2. Prepare your inut files in <your_working_directory> and run
+- Step 2. Prepare your inut files in <your_working_directory> and run directly  
 `docker run -it -v <your_working_directory>:/data nlmirpjianglab/evolink /bin/bash -c "source ~/.bashrc; Evolink.py -g /data/gene.tsv -t /data/trait.tsv -n /data/tree.nwk -o /data/test_out -f"`
 
 
