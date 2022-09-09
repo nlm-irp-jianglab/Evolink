@@ -15,4 +15,4 @@ A detailed document is provided here: [Evolink pages](https://nlm-irp-jianglab.g
 
 # Other resources
 
-We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make you have a better exprience with Evolink.
+We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make you have a better experience with Evolink.

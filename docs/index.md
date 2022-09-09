@@ -17,7 +17,9 @@ Tested on a flagella dataset with a large tree (with 1,948 leaves) and a gene fa
 
 ## Installation
 ---
-To install Evolink is easy.
+To install Evolink is easy and you have three choices.
+
+### Use Conda
 - Step 1. Git clone project  
 `git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
 `cd Evolink`
@@ -25,14 +27,25 @@ To install Evolink is easy.
 - Step 2. Build conda environment  
 `conda env create -f environment.yml`
 
-- Alternative for Step 2
+- Step 3. Activate Evolink environment  
+`conda activate Evolink`
+
+- Step 4. Setup required R packages
+`Rscript setup.R`
+
+### Use Mamba
 To expereince a much faster installation:
 Please install [mamba](https://mamba.readthedocs.io/en/latest/installation.html) first.
 If you use Linux, install mamba is very easy:
 `wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`
 `bash Mambaforge-$(uname)-$(uname -m).sh`
 
-and then build environment
+The installation is very similar to using conda.
+- Step 1. Git clone project  
+`git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
+`cd Evolink`
+
+- Step 2. Build mamba environment  
 `mamba env create -f environment.yml`
 
 - Step 3. Activate Evolink environment  
@@ -40,6 +53,16 @@ and then build environment
 
 - Step 4. Setup required R packages
 `Rscript setup.R`
+
+### Use Docker
+Running Evolink using a docker is also an option.
+
+- Step 1. Pull the docker
+`docker pull nlmirpjianglab/evolink`
+
+- Step 2. Prepare your inut files in <your_working_directory> and run
+`docker run -it -v <your_working_directory>:/data nlmirpjianglab/evolink /bin/bash -c "source ~/.bashrc; Evolink.py -g /data/gene.tsv -t /data/trait.tsv -n /data/tree.nwk -o /data/test_out -f"`
+
 
 ## Input
 ---
