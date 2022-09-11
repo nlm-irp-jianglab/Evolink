@@ -9,7 +9,7 @@
 
 # Document
 
-A detailed document is provided here: [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
+A detailed guidance is provided here: [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 
 
 # Other resources

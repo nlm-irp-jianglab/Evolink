@@ -6,3 +6,4 @@ scripts/
 test_flagella_WOL/
 test_sporulation_WOL/
 archives/
+iTOL/__pycache__
