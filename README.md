@@ -16,6 +16,11 @@ A detailed document is provided here: [Evolink document](https://nlm-irp-jiangla
 
 We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make you have a better experience with Evolink.
 
+# Acknowledgements
+
+- [Unifrac](https://github.com/biocore/unifrac) python pcakage
+- [PMCMRplus](https://cran.r-project.org/web/packages/PMCMRplus/index.html) R package
+
 # Citation
 
 To be added
