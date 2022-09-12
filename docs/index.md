@@ -35,7 +35,7 @@ To install Evolink is easy and you have three choices.
 To expereince a much faster installation:
 Please install [mamba](https://mamba.readthedocs.io/en/latest/installation.html) first.
 If you use Linux, install mamba is very easy:  
-`wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`
+`wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`
 `bash Mambaforge-$(uname)-$(uname -m).sh`
 
 The installation is very similar to using conda.  
