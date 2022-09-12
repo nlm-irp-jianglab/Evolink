@@ -59,7 +59,7 @@ Running Evolink using a [docker](https://docs.docker.com/engine/install/) is als
 `docker pull nlmirpjianglab/evolink`
 
 - Step 2. Prepare your inut files in <your_working_directory> and run directly  
-`docker run -it -v <your_working_directory>:/data nlmirpjianglab/evolink /bin/bash -c "source ~/.bashrc; Evolink.py -g /data/gene.tsv -t /data/trait.tsv -n /data/tree.nwk -o /data/test_out -f"`
+`docker run -it -v <your_working_directory>:/data nlmirpjianglab/evolink /bin/bash -c "source ~/.bashrc; Evolink.py -g /data/<your_genotype_file> -t /data <your_phenotype_file> -n /data/<your_tree_file> -o /data/output -f"`
 
 
 ## Input
