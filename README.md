@@ -6,6 +6,27 @@
 
 ![Evolink](img/Logo.jpg)
 
+# repo structure and file description
+```
+.
+├── docs/
+├── environment.yml
+├── Evolink_plot.R
+├── Evolink.py
+├── flagella_data/
+├── gram_staining_data/
+├── img/
+├── LICENSE
+├── README.md
+├── scripts
+│   ├── gesd_test.R
+│   └── simulate_gene.R
+├── setup.R
+└── test_data
+    ├── test_data.zip
+    ├── test_output.zip
+    └── test.sh
+```
 
 # Document
 
