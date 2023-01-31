@@ -1,9 +1,9 @@
+small_eg*/
 test_data/archives/
 test/
 flagella_data/
 test_flagella_GTDB/
-scripts/
-test_flagella_WOL/
-test_sporulation_WOL/
+assist_scripts/
+test_*_WOL/
 archives/
 iTOL/__pycache__

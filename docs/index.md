@@ -14,6 +14,27 @@ Tested on a flagella dataset with a large tree (with 1,948 leaves) and a gene fa
 ---
 To install Evolink is easy and you have three choices.
 
+### Use Mamba
+To expereince a much faster installation:
+Please install [mamba](https://mamba.readthedocs.io/en/latest/installation.html) first.
+If you use Linux, install mamba is very easy:  
+`wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`  
+`bash Mambaforge-$(uname)-$(uname -m).sh`
+
+The installation is very similar to using conda.  
+- Step 1. Git clone project  
+`git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
+`cd Evolink`
+
+- Step 2. Build mamba environment  
+`mamba env create -f environment.yml`
+
+- Step 3. Activate Evolink environment   
+`conda activate Evolink`
+
+- Step 4. Setup required R packages  
+`Rscript setup.R`
+
 ### Use Conda
 - Install [Anaconda](https://www.anaconda.com/products/distribution) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) first. They are distributions of the Python and R programming languages for scientific computing, greatly simplifying package management and deployment.
 - [Anaconda or Miniconda?](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda)
@@ -29,27 +50,6 @@ To install Evolink is easy and you have three choices.
 `conda activate Evolink`
 
 - Step 4. Setup required R packages
-`Rscript setup.R`
-
-### Use Mamba
-To expereince a much faster installation:
-Please install [mamba](https://mamba.readthedocs.io/en/latest/installation.html) first.
-If you use Linux, install mamba is very easy:  
-`wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`
-`bash Mambaforge-$(uname)-$(uname -m).sh`
-
-The installation is very similar to using conda.  
-- Step 1. Git clone project  
-`git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
-`cd Evolink`
-
-- Step 2. Build mamba environment  
-`mamba env create -f environment.yml`
-
-- Step 3. Activate Evolink environment   
-`conda activate Evolink`
-
-- Step 4. Setup required R packages  
 `Rscript setup.R`
 
 ### Use Docker
@@ -91,12 +91,12 @@ Evolink takes 3 essential input files:
 ---
 ```
 usage: Evolink.py [-h] -g GENE_TABLE -t TRAIT_TABLE -n TREE [-m MODE] [-c]
-                  [-p THRESHOLD] [-r SEED] [--gesd-mc-method METHOD]
-                  [--gesd-pval-threshold THRESHOLD]
-                  [--gesd-padj-threshold THRESHOLD]
-                  [--outlier-score-threshold THRESHOLD]
+                  [-p THRESHOLD] [-s SEED]
+                  [--min-outlier-score-threshold THRESHOLD]
                   [--n-estimators NUMBER] [--max-samples PERCENTAGE]
-                  [-z THRESHOLD] [-e THRESHOLD] [--fold-times FOLD_TIMES]
+                  [--gesd-mc-method METHOD] [--gesd-pval-threshold THRESHOLD]
+                  [--gesd-padj-threshold THRESHOLD] [-z THRESHOLD]
+                  [-e THRESHOLD] [--fold-times FOLD_TIMES]
                   [--perm-mc-method METHOD] [--perm-padj-threshold THRESHOLD]
                   [-v] [-N TOP_GENES] [-d {1,2}] [-f] -o OUTPUT
 
@@ -122,11 +122,11 @@ optional arguments:
                         A phylogentic tree in newick format. The tip names
                         should be the same in the gene table and trait table.
   -m MODE, --mode MODE  Evolink has four modes insofar to detect phenotype-
-                        assoicated genotypes: gesd_test, isolation_forest,
+                        assoicated genotypes: isolation_forest, gesd_test,
                         (modified) z_score, and cutoff. Running time:
                         isolation_forest > gesd_test > z_score > cutoff.
-                        [Choices: gesd_test, isolation_forest, z_score,
-                        cutoff; Default: gesd_test]
+                        [Choices: isolation_forest, gesd_test, z_score,
+                        cutoff; Default: isolation_forest]
   -c, --copy-number     The given gene table stores numbers (e.g. gene copy
                         numbers) instead of presence/absence binary values.
                         [Default: True]
@@ -136,6 +136,15 @@ optional arguments:
                         Default: 0.9]
   -s SEED, --seed SEED  Set seed for simulation for reproducibility of the
                         results [Default: 1]
+  --min-outlier-score-threshold THRESHOLD
+                        A minimal threshold to determine outliers by
+                        IsolationForest [Default: 0.7; Range: 0.5-1]
+  --n-estimators NUMBER
+                        Number of tree estimators used in IsolationForest
+                        [Default: 200]
+  --max-samples PERCENTAGE
+                        Percentage of training samples for each tree in
+                        IsolationForest [Default: 0.1]
   --gesd-mc-method METHOD
                         Multitest correction method [Choices: none,
                         bonferroni, fdr, holm, hommel; Default: none]
@@ -143,15 +152,6 @@ optional arguments:
                         Original p-value threshold [Default:0.1]
   --gesd-padj-threshold THRESHOLD
                         Adjusted p-value threshold [Default:0.2]
-  --outlier-score-threshold THRESHOLD
-                        A threshold to determine outliers by IsolationForest
-                        [Default: 0.8; Range: 0.5-1]
-  --n-estimators NUMBER
-                        Number of tree estimators used in IsolationForest
-                        [Default: 200]
-  --max-samples PERCENTAGE
-                        Percentage of training samples for each tree in
-                        IsolationForest [Default: 0.1]
   -z THRESHOLD, --z-score-threshold THRESHOLD
                         Absolute modified z-score threshold [Default:3.5]
   -e THRESHOLD, --e-threshold THRESHOLD

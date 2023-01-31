@@ -9,7 +9,7 @@ suppressPackageStartupMessages({
 
 option_list = list(
     make_option(c("-m", "--mode"), type="character", default="Clustering", 
-              help="Evolink detection mode. [gesd_test, isolation_forest, permutation, z_score, or cutoff, default is Clustering]", metavar="character"),
+              help="Evolink detection mode. [isolation_forest, gesd_test, permutation, z_score, or cutoff, default is Clustering]", metavar="character"),
     make_option(c("-g", "--gene"), type="character", default="gene.tsv", 
               help="gene file", metavar="character"),
     make_option(c("-t", "--trait"), type="character", default="trait.tsv", 
@@ -108,17 +108,19 @@ if(length(neg_genes)>=1){
 
 # 2. Evolink plot
 bound = max(abs(res$Evolink_index))
-plot_data = res %>% mutate(genotypes = case_when((Evolink_index > 0 & significance == "sig") ~ "up",
-                        (Evolink_index < 0 & significance == "sig") ~ "down",
-                        TRUE ~ "background"))
+plot_data = res %>% mutate(genotypes = case_when((Evolink_index > 0 & significance == "sig") ~ "Positive",
+                        (Evolink_index < 0 & significance == "sig") ~ "Negative",
+                        TRUE ~ "Background"))
 p = ggplot(plot_data, aes(x=Prevalence_index, y=Evolink_index, color=genotypes)) + 
     geom_hline(yintercept=0, color="black", size=0.2, linetype="dotted") +
     geom_vline(xintercept=0, color="black", size=0.2, linetype="dotted") +
     geom_point(alpha=0.9) +
-    scale_color_manual(breaks = c("up","down","background"), values=c("#FE6D73", "#227C9D", "grey")) +
+    scale_color_manual(breaks = c("Positive","Negative","Background"), values=c("#FE6D73", "#227C9D", "grey")) +
     ylim(c(-1*bound, bound)) +
     theme(text = element_text(size = 10)) +
-    theme_classic()
+    theme_classic() +
+    xlab("Prevalence index") +
+    ylab("Evolink index")
 
 evolink_plot_path = file.path(outdir, "Evolink_plot.pdf")
 ggsave(evolink_plot_path, device="pdf", width=15, height=10, units="cm")
@@ -126,18 +128,37 @@ print(paste("Generate", evolink_plot_path, "done."))
 
 # 3. Manhattan plot
 if(mode == "permutation" | mode == "gesd_test" ){
-    plot_data = res %>% filter(!is.na(pvalue.adj)) %>% mutate(genes=case_when((Evolink_index > 0 & significance == "sig") ~ "up",
-                                (Evolink_index < 0 & significance == "sig") ~ "down",
-                                TRUE ~ "background"))
+    plot_data = res %>% filter(!is.na(pvalue.adj)) %>% mutate(genes=case_when((Evolink_index > 0 & significance == "sig") ~ "Positive",
+                                (Evolink_index < 0 & significance == "sig") ~ "Negative",
+                                TRUE ~ "Background"))
     plot_data$x = 1:length(plot_data$Evolink_index)
 
     plot_data$pvalue_plot = abs(jitter(plot_data$pvalue.adj))
     p = ggplot(plot_data, aes(x=x, y=-log10(pvalue_plot), color=genes)) + 
         geom_point(alpha=0.9) + 
-        scale_color_manual(breaks=c("up", "down", "background"), values=c("#FE6D73", "#227C9D", "grey")) +
+        scale_color_manual(breaks=c("Positive", "Negative", "Background"), values=c("#FE6D73", "#227C9D", "grey")) +
         geom_hline(yintercept=-log10(cutoff), color="black") + 
         xlab("genotypes") +
         ylab(expression("-log"[10]*"(Pvalue)")) + 
+        theme_classic()
+
+    manhattan_plot_path = file.path(outdir, "Manhattan_plot.pdf")
+    ggsave(manhattan_plot_path, device="pdf", width=20, height=12, units="cm")
+    print(paste("Generate", manhattan_plot_path, "done."))
+}
+if(mode == "isolation_forest"){
+    plot_data = res %>% filter(!is.na(scores)) %>% mutate(genes=case_when((Evolink_index > 0 & significance == "sig") ~ "Positive",
+                                (Evolink_index < 0 & significance == "sig") ~ "Negative",
+                                TRUE ~ "Background"))
+    plot_data$x = 1:length(plot_data$Evolink_index)
+
+    plot_data$score_plot = jitter(plot_data$scores)
+    p = ggplot(plot_data, aes(x=x, y=score_plot, color=genes)) + 
+        geom_point(alpha=0.9) + 
+        scale_color_manual(breaks=c("Positive", "Negative", "Background"), values=c("#FE6D73", "#227C9D", "grey")) +
+        geom_hline(yintercept=cutoff, color="black") + 
+        xlab("genotypes") +
+        ylab("Outlier detection score") + 
         theme_classic()
 
     manhattan_plot_path = file.path(outdir, "Manhattan_plot.pdf")

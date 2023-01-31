@@ -11,6 +11,9 @@
 
 A detailed guidance is provided here: [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 
+# A use case with flagella data as an example
+
+A use case showing users how to apply Evolink to a real-world flagella-related dataset is provided here: [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
 
 # Other resources
 
@@ -22,5 +25,4 @@ We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and 
 - [PMCMRplus](https://cran.r-project.org/web/packages/PMCMRplus/index.html) R package
 
 # Citation
-
 To be added
