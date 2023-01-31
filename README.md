@@ -6,27 +6,37 @@
 
 ![Evolink](img/Logo.jpg)
 
-# repo structure and file description
+# File structure and script description
 ```
 .
-├── docs/
-├── environment.yml
-├── Evolink_plot.R
-├── Evolink.py
-├── flagella_data/
-├── gram_staining_data/
-├── img/
-├── LICENSE
 ├── README.md
+├── Evolink.py
+├── Evolink_plot.R
 ├── scripts
 │   ├── gesd_test.R
 │   └── simulate_gene.R
+├── environment.yml
 ├── setup.R
-└── test_data
-    ├── test_data.zip
-    ├── test_output.zip
-    └── test.sh
+├── docs/
+├── img/
+├── flagella_data/
+├── gram_staining_data/
+└── test_data/
+
 ```
+- `README.md`: The page you are watching now.
+- `Evolink.py`: Evolink main script.
+- `Evolink_plot.R`: An indenpendent R script to help visualize Evolink result.
+- `scripts/gesd_test.R`: An R script to perform the gesd test to detect phenotype-associated genotypes (Evolink mode=gesd_test).
+- `scripts/simulate_gene.R`: An R script to perform permutation on genotype to detect phenotype-associated genotypes (Evolink mode=permutation).
+- `environment.yml`: Conda environment yaml file with all dependencies for creating Evolink environment. See details in [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
+- `setup.R`: An R script to help install R packages used in Evolink. See details in [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
+- `docs/`: A folder containing materials for [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
+- `img/`: A folder storing the Evolink logo.
+- `flagella_data/`: A folder containing walkthrough `Records.md` and related data for a use case with flagella data as an example. See details in [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
+- `gram_staining_data/`: A folder containing walkthrough `Records.md` and related data for a use case with gram-staining data as an example.
+- `test_data/`: A folder containing a bash script `test.sh` and related data for testing.
+
 
 # Document
 
@@ -42,7 +52,8 @@ We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and 
 
 # Acknowledgements
 
-- [Unifrac](https://github.com/biocore/unifrac) python pcakage
+- [Unifrac](https://github.com/biocore/unifrac) python module
+- [Scikit-learn](https://scikit-learn.org/stable/) python library
 - [PMCMRplus](https://cran.r-project.org/web/packages/PMCMRplus/index.html) R package
 
 # Citation
