@@ -55,6 +55,7 @@ We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and 
 - [Unifrac](https://github.com/biocore/unifrac) python module
 - [Scikit-learn](https://scikit-learn.org/stable/) python library
 - [PMCMRplus](https://cran.r-project.org/web/packages/PMCMRplus/index.html) R package
+- [treeWAS](https://github.com/caitiecollins/treeWAS) R package
 
 # Citation
 To be added
