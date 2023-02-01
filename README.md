@@ -32,9 +32,9 @@
 - `environment.yml`: Conda environment yaml file with all dependencies for creating Evolink environment. See details in [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 - `setup.R`: An R script to help install R packages used in Evolink. See details in [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 - `docs/`: A folder containing materials for [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
-- `img/`: A folder storing the Evolink logo.
-- `flagella_data/`: A folder containing walkthrough `Records.md` and related data for a use case with flagella data as an example. See details in [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
-- `gram_staining_data/`: A folder containing walkthrough `Records.md` and related data for a use case with gram-staining data as an example.
+- `img/`: A folder containing the Evolink logo.
+- `flagella_data/`: A folder containing a walkthrough named `Records.md` and related data for a use case with flagella data as an example. See details in [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
+- `gram_staining_data/`: A folder containing a walkthrough named `Records.md` and related data for a use case with gram-staining data as an example.
 - `test_data/`: A folder containing a bash script `test.sh` and related data for testing.
 
 

@@ -79,7 +79,7 @@ Output `gene.tsv` is an orthogroup (row) X species (column) tab-delimited table:
 ### Step.4 run Evolink and generate plots
 Note that `gene.tsv`, `trait.tsv`, `tree.nwk` input files can be found in example_input.zip.  
 ```
-# By default, Evolink doesn't plot. To enable visualization, use '-v' option. To overwrite output directory, 
+# By default, Evolink doesn't plot. To enable visualization, use '-v' option. To overwrite output directory, use '-f' option.
 python ../Evolink.py -g gene.tsv -t trait.tsv -n tree.nwk -o Evolink_output_plot -f -v > output.log
 ```
 Output:  
