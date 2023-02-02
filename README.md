@@ -23,9 +23,8 @@
 ├── gram_staining_data/
 ├── test_data/
 └── Evolink_paper/
-
-
 ```
+
 - `README.md`: The page you are watching now.
 - `Evolink.py`: Evolink main script.
 - `Evolink_plot.R`: An indenpendent R script to help visualize Evolink result.
