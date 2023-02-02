@@ -11,5 +11,5 @@ mkdir -p ${outdir}
 source /data/$USER/conda/etc/profile.d/conda.sh
 conda activate bio-env
 
-python softwares/Evolink.py -n ${tree_file} -g ${gene_file} -t ${trait_file} -o ${outdir} -m ${mode} -f
+python software/Evolink.py -n ${tree_file} -g ${gene_file} -t ${trait_file} -o ${outdir} -m ${mode} -f
 grep -w sig ${outdir}/result.tsv| cut -f1 > ${outdir}/Evolink_sig_genes.list
