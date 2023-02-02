@@ -21,7 +21,9 @@
 ├── img/
 ├── flagella_data/
 ├── gram_staining_data/
-└── test_data/
+├── test_data/
+└── Evolink_paper/
+
 
 ```
 - `README.md`: The page you are watching now.
@@ -36,6 +38,7 @@
 - `flagella_data/`: A folder containing a walkthrough named `Records.md` and related data for a use case with flagella data as an example. See details in [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
 - `gram_staining_data/`: A folder containing a walkthrough named `Records.md` and related data for a use case with gram-staining data as an example.
 - `test_data/`: A folder containing a bash script `test.sh` and related data for testing.
+- `Evolink_paper/`: A folder containing paper-related data and scripts to compare Evolink and other methods on simulated and empirical datasets. See details in `Evolink_paper/README.md`.
 
 
 # Document
