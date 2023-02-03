@@ -52,15 +52,6 @@ The installation is very similar to using conda.
 - Step 4. Setup required R packages
 `Rscript setup.R`
 
-### Use Docker
-Running Evolink using a [docker](https://docs.docker.com/engine/install/) is also an option.
-
-- Step 1. Pull the docker  
-`docker pull nlmirpjianglab/evolink`
-
-- Step 2. Prepare your inut files in `<your_working_directory>` and run directly  
-`docker run -it -v <your_working_directory>:/data nlmirpjianglab/evolink /bin/bash -c "source ~/.bashrc; Evolink.py -g /data/<your_genotype_file> -t /data <your_phenotype_file> -n /data/<your_tree_file> -o /data/output -f"`
-
 ## Input
 ---
 Evolink takes 3 essential input files:

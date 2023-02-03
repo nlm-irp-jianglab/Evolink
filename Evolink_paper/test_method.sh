@@ -13,14 +13,6 @@ cd ${wd_dir}
 
 case $method in
 
-Chisq)
-    # Chisq
-    echo "Chisq test"
-    Chisq_test=${scrdir}/run_chisq_test.R
-    mkdir -p Chisq_out
-    time Rscript --vanilla ${Chisq_test} ${gene_file} ${trait_file} Chisq_out/Chisq_test_sig_genes.list &> Chisq.out
-;;
-
 Tet_corr)
     # tet_corr
     echo "Tetrachoric correlation"
