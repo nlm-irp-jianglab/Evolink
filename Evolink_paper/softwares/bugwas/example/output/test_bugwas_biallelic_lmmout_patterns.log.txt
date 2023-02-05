@@ -1,0 +1,25 @@
+##
+## GEMMA Version = 0.93 modified by DJW 24/3/15 
+##
+## Command Line Input = -g test_bugwas_biallelic_gemma_genfile.txt -p test_bugwas_gemma_phenotype.txt -a test_bugwas_biallelic_gemma_snpfile.txt -k /gpfs/gsfs12/users/yangy34/projects/Evolink/test_flagella_WOL/Bugwas_res/bugwas/example/output/test_bugwas_gemma_relmatrixout.cXX.txt -lmm 2 -o test_bugwas_biallelic_lmmout_patterns -maf 0 
+##
+## Summary Statistics:
+## number of total individuals = 100
+## number of analyzed individuals = 100
+## number of covariates = 1
+## number of total SNPs = 1192
+## number of analyzed SNPs = 1192
+## lambda REMLE estimate in the null (linear mixed) model = 11.7586
+## lambda MLE estimate in the null (linear mixed) model = 12.0688
+## pve estimate in the null (linear mixed) model = 0.563087
+## se(pve) in the null (linear mixed) model = 0.15088
+## log-REML in the null (linear mixed) model = -51.7366
+## log-ML in the null (linear mixed) model = -51.6104
+##
+## Computation Time:
+## total computation time = 0.00533333 min 
+## computation time break down: 
+##      time on eigen-decomposition = 0.000166667 min 
+##      time on calculating UtX = 0 min 
+##      time on optimization = 0.004 min 
+##

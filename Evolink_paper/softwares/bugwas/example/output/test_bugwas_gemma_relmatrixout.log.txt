@@ -1,0 +1,17 @@
+##
+## GEMMA Version = 0.93 modified by DJW 24/3/15 
+##
+## Command Line Input = -g test_bugwas_gemma_kinship_genfile.txt -p test_bugwas_gemma_phenotype.txt -a test_bugwas_gemma_kinship_snpfile.txt -gk 1 -o test_bugwas_gemma_relmatrixout -maf 0 
+##
+## Summary Statistics:
+## number of total individuals = 100
+## number of analyzed individuals = 100
+## number of covariates = 1
+## number of total SNPs = 4791
+## number of analyzed SNPs = 4791
+##
+## Computation Time:
+## total computation time = 0.00233333 min 
+## computation time break down: 
+##      time on calculating relatedness matrix = 0.00133333 min 
+##
