@@ -236,5 +236,6 @@ b) Or if you have a iTOL subscription API key and have installed [iTOL API](http
 In addition, we also provided a script "Evolink_plot.R" to individually generate local figures after you get the result from Evolink (i.e. result.tsv):  
 ```Rscript --vanilla Evolink_plot.R -g test_data/gene.tsv -t test_data/trait.tsv -n test_data/tree.nwk -r test_data/output_dir/result.tsv -o test_data/plot_dir```
 
-## Use case:
+## Use case
+---
 We further provide a use case with Flagella data as an example. Click [here](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md) for more details.
