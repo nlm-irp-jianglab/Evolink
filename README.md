@@ -25,32 +25,36 @@
 └── Evolink_paper/
 ```
 
-- `README.md`: The page you are watching now.
+- `README.md`: The page you are seeing now.
 - `Evolink.py`: Evolink main script.
-- `Evolink_plot.R`: An indenpendent R script to help visualize Evolink result.
+- `Evolink_plot.R`: An indenpendent R script to help visualize Evolink results.
 - `scripts/gesd_test.R`: An R script to perform the gesd test to detect phenotype-associated genotypes (Evolink mode=gesd_test).
-- `scripts/simulate_gene.R`: An R script to perform permutation on genotype to detect phenotype-associated genotypes (Evolink mode=permutation).
-- `environment.yml`: Conda environment yaml file with all dependencies for creating Evolink environment. See details in [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
+- `scripts/simulate_gene.R`: An R script to perform permutation on genotypes to detect phenotype-associated genotypes (Evolink mode=permutation).
+- `environment.yml`: Conda environment yaml file with all dependencies for creating an Evolink environment. See details in [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 - `setup.R`: An R script to help install R packages used in Evolink. See details in [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 - `docs/`: A folder containing materials for [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 - `img/`: A folder containing the Evolink logo.
 - `flagella_data/`: A folder containing a walkthrough named `Records.md` and related data for a use case with flagella data as an example. See details in [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
 - `gram_staining_data/`: A folder containing a walkthrough named `Records.md` and related data for a use case with gram-staining data as an example.
 - `test_data/`: A folder containing a bash script `test.sh` and related data for testing.
-- `Evolink_paper/`: A folder containing paper-related data and scripts to compare Evolink and other methods on simulated and empirical datasets. See details in `Evolink_paper/README.md`.
+- `Evolink_paper/`: A folder containing additional data used in the Evolink paper along with scripts to compare Evolink to other methods on simulated and empirical datasets. See details in `Evolink_paper/README.md`.
 
 
 # Document
 
-A detailed guidance is provided here: [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
+Documentation detailing the installation, Evolink input and Evolink output is provided here: [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 
-# A use case with flagella data as an example
+# Flagellar dataset example
 
-A use case showing users how to apply Evolink to a real-world flagella-related dataset is provided here: [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
+A use case showing how to apply Evolink to a real-world flagella-related dataset is provided here: [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
+
+# Gram-staining dataset example
+
+A use case showing users how to apply Evolink to a real-world gram-staining dataset is provided here: [Gram-staining use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/gram_staining_data/Records.md).
 
 # Other resources
 
-We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make you have a better experience with Evolink.
+We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make it easier to run and access Evolink on different platforms.
 
 # Acknowledgements
 
