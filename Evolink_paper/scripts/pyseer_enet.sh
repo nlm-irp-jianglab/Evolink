@@ -16,8 +16,8 @@ sed "s/#OTU ID/gene/g" ${gene_path} > ${outdir}/gene.tsv
 gene_path=${outdir}/gene.tsv
 
 # trait 
-awk -F"\t" 'NR==1{print "samples\tbinary"}NR>1{print $0}' ${trait_path} > tmp
-mv tmp ${outdir}/trait.tsv
+awk -F"\t" 'NR==1{print "samples\tbinary"}NR>1{print $0}' ${trait_path} > ${outdir}/tmp
+mv ${outdir}/tmp ${outdir}/trait.tsv
 trait_path=${outdir}/trait.tsv
 
 # distance matrix

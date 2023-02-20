@@ -2,22 +2,22 @@
 
 ## Overview
 ---
-In breif, Evolink is a phylogeny-based tool to detect genotypes (both positively and negatively associated ones) contributed to a phenotype present in multi-species (e.g. resistance, virulence, host and colony).
+Evolink is a phylogeny-based tool to detect genotypes (both positively and negatively associated ones) associated with a phenotype present in multi-species datasets (e.g. resistance, virulence, host and colony).
 
-Identification of genotype-phenotype associations is a fundamental task not only in microbiology but also in the whole field of biology. Yet as microbial data is rapidly increasing, the scales of gene family pool (~10^6) and phylogenetic tree (with > 10^5 leaves) make current methods less efficient to link genotypes to traits. 
+Identification of genotype-phenotype associations is a fundamental task not only in microbiology but also across all of biology. Yet as the amount of microbial data is rapidly increasing, the amount of identified gene families (~10^6) and size of phylogenetic trees (with > 10^5 leaves) make it difficult to apply current methods to link genotypes to phenotypes. 
 
-Phylogenetic information is accepted as a good resource to control for population structure in microbial genotype-phenotype association analyses and avoid spurious findings. That's why Evolink was developed based on the use of phylogeny.
+Utilizing phylogenetic information is a good way to control for population structure in microbial genotype-phenotype association analyses helping to avoid spurious findings. That's why Evolink was developed based on the use of phylogeny.
 
-Tested on a flagella dataset with a large tree (with 1,948 leaves) and a gene family presence/absence matrix (containing 149,316 gene families), Evolink could give results in less than 5 minutes, demonstrating its capability of mining genotypes correlated to a phenotype on large-scale datasets.
+Evolink is able to outperform other similar tools in terms of accuracy and efficiency, being able to handle large datasets in just minutes. 
 
 ## Installation
 ---
-To install Evolink is easy and you have three choices.
+To install Evolink is easy and you have two choices.
 
 ### Use Mamba
 To expereince a much faster installation:
 Please install [mamba](https://mamba.readthedocs.io/en/latest/installation.html) first.
-If you use Linux, install mamba is very easy:  
+If you use Linux, installing mamba is very easy:  
 `wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh`  
 `bash Mambaforge-$(uname)-$(uname -m).sh`
 
@@ -52,14 +52,22 @@ The installation is very similar to using conda.
 - Step 4. Setup required R packages
 `Rscript setup.R`
 
+### Alternatives
+
+In addition to a local installation of Evolink, we provide both a docker image and webserver that can be used to run Evolink analyses. 
+
+Docker: https://hub.docker.com/r/nlmirpjianglab/evolink
+Webserver: https://jianglabnlm.com/evolink/
+
+
 ## Input
 ---
 Evolink takes 3 essential input files:
-1) Species tree (newick format). It is recommended that the tree is rooted. Internal node names are not necessary. For example:  
+1) A species tree (in newick format). It is recommended that the tree is rooted. Internal node names are not necessary. For example:  
 
 ``` (species_1:1,(species_2:1,(species_3:1,species_4:1)Internal_1:0.5)Internal_2:0.5)Root:0.1; ```
 
-2) Trait/Phenotype binary file (tab separated file). The header is a must and should be "Tip" and "Status". Tip column contains the tip names the same as the tree, while Status column contains the presence (1) and absence (0) of the phenotype for each leaf. So far only 1 or 0 is accepted and all leaves should be labeled with a 0/1 status. For example:  
+2) A trait/phenotype binary file (tab separated file). The column headers should be "Tip" and "Status". The tip column contains the tip names the same as the tree, while the Status column contains the presence (1) and absence (0) of the phenotype for each leaf. So far only 1 or 0 is accepted and all leaves should be labeled with a 0/1 status. For example:  
 
 | Tip       | Status |
 |-----------|--------|
@@ -68,7 +76,7 @@ Evolink takes 3 essential input files:
 | species_3 | 1      |
 | species_4 | 0      |
 
-3) Gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene across all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
+3) The gene presence/absence matrix file (tab separated file). Each row is the binary (0/1) status of each gene across all species. Each gene should appear in a species for at least one time. The first colname could be any word, but "orthoID" (orthogroup ID) is a nice choice to be shown here. For example:  
 
 | orthoID | species_1 | species_2 | species_3 | species_4 |
 |---------|-----------|-----------|-----------|-----------|
@@ -91,7 +99,7 @@ usage: Evolink.py [-h] -g GENE_TABLE -t TRAIT_TABLE -n TREE [-m MODE] [-c]
                   [--perm-mc-method METHOD] [--perm-padj-threshold THRESHOLD]
                   [-v] [-N TOP_GENES] [-d {1,2}] [-f] -o OUTPUT
 
-Evolink is designed to find gene families associated with trait by explicitly
+Evolink is designed to find gene families associated with a trait by explicitly
 using phylogeny information.
 
 optional arguments:
@@ -177,17 +185,17 @@ optional arguments:
 unzip test_data/test_data.zip
 ```
 
-1. With binary gene presence/absence table and no plots by default (the most common usage):
+1. With a binary gene presence/absence table and no plots by default (the most common usage):
 ```
 python Evolink.py -g test_data/gene.tsv -t test_data/trait.tsv -n test_data/tree.nwk -o output_dir
 ```
 
-2. With gene copy number table (add "-c" option):
+2. With a gene copy number table (add "-c" option):
 ```
 python Evolink.py -g test_data/gene_CN.tsv -c -t test_data/trait.tsv -n test_data/tree.nwk -o output_dir_CN
 ```
 
-3. Enable plot function (add "-v" option. To save time, Evolink will not generate figures by default):
+3. Enable the plot function (add "-v" option. To save time, Evolink will not generate figures by default):
 ```
 python Evolink.py -g test_data/gene.tsv -t test_data/trait.tsv -n test_data/tree.nwk -o output_plot_dir -v
 ```
@@ -199,7 +207,7 @@ python Evolink.py -g test/gene.tsv -c -t test/trait.tsv -n test/tree.nwk -o outp
 
 ## Output
 ---
-A basic output file from Evolink is named "result.tsv" in the output directory provided by the user. It includes "Evolink_index", "Prevelance_index", "significance" and "z_score".  "Evolink_index" and "significance" are the most useful values. For example:  
+The basic output file from Evolink is named "result.tsv" and is generated in the output directory provided by the user. It includes "Evolink_index", "Prevelance_index", "significance" and "z_score".  The "Evolink_index" and "significance" are the most useful values for identifying positively and negatively associated genes. For example:  
 
 | orthoID | Prevalence_index      | Evolink_index         | pvalue                 | pvalue.adj             | significance |
 |---------|-----------------------|-----------------------|------------------------|------------------------|--------------|
@@ -211,7 +219,7 @@ A basic output file from Evolink is named "result.tsv" in the output directory p
 | g8004   | 0.19435017310947744   | 0.619534971390268     | 3.0051525400727557e-05 | 3.0051525400727557e-05 | sig          |
 
 
-When enabling the plot function (with -v or --visualization option), Evolink provides in the output directory four types of figures (see example outputs [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_dir) and [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_perm_dir)):
+When enabling the plot function (with -v or --visualization option), Evolink generates four types of figures in the output directory (see example outputs [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_dir) and [here](https://github.com/nlm-irp-jianglab/Evolink/tree/main/test/output_perm_dir)):
 
 #### 1) iTOL website input
 A tree file (input.tree) and annotation file (binary.txt) as well as a zipped file called **Evolink_itol_input.zip** are provided for users to visualize their results on the [Tree of Life (iTOL)](https://itol.embl.de/).  
@@ -239,3 +247,12 @@ In addition, we also provided a script "Evolink_plot.R" to individually generate
 ## Use case
 ---
 We further provide a use case with Flagella data as an example. Click [here](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md) for more details.
+
+## FAQ
+---
+- Q1: What if my data contains species with multiple samples of genotype data (strains)?  
+- 1) If a species contains multiple strains with similar genotypes and same phenotype, the easiest solution would be to select a representative strain to serve as a genotype representative for that species. 2) If the strains of a species display diverse phenotypes, we would recommended constructing a phylogenetic tree that includes all strains and utilize all available genotype and phenotype information in the analysis. 
+It should be noted that mGWAS (microbial genome-wide association study) methods (such as [Bugwas](https://github.com/sgearle/bugwas), [Pyseer](https://github.com/mgalardini/pyseer) and [treeWAS](https://github.com/caitiecollins/treeWAS)) are recmmended for multiple samples from closely related species, as they not only consider gene presence and absence but also single nucleotide polymorphisms (SNPs).  
+
+- Q2: What if a genome is assigned with multiple phenotypes?  
+- If a genome is associated with multiple categories of phenotype, it is recommended to treat each category as a separate binary variable using one-hot encoding and to run Evolink separately for each category.
