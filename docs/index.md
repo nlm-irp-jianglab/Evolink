@@ -46,7 +46,7 @@ The installation is very similar to using conda.
 - Step 2. Build conda environment  
 `conda env create -f environment.yml`
 
-- Step 3. Activate Evolink environment  
+- Step 3. Activate Evolink environment
 `conda activate Evolink`
 
 - Step 4. Setup required R packages
