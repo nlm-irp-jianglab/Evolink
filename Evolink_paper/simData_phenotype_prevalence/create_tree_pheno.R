@@ -17,7 +17,7 @@ for(prev in c(0.1, 0.3, 0.5, 0.7, 0.9)){
     names(pheno) = tree$tip.label
 
     # outfile
-    outdir=paste0("/data/yangy34/projects/Evolink/simData_prevalence/", "prev_", prev)
+    outdir=file.path("simData_phenotype_prevalence", paste0("prev_", prev))
     if(!file.exists(outdir)){dir.create(outdir)}
 
     saveRDS(tree, paste0(outdir, "/tree.rds"))

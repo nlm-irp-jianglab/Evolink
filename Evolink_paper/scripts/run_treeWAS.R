@@ -6,6 +6,10 @@ suppressMessages({
 # Version v1.0: filter genes that are too prevalent and rare, so as to reduce running time
 # Usage: time Rscript --vanilla run_treeWAS.R tree.nwk gene.tsv trait.tsv treeWAS_out
 
+######################################
+# Wrap treeWAS running in a R script #
+######################################
+
 args = commandArgs(trailingOnly=TRUE)
 
 ### read data ###

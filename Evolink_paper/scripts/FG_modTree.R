@@ -1,3 +1,11 @@
+#################################################
+# Modify tree file:                             #
+# 1) convert it into bifuricated tree           #
+# 2) add an extreme number to zero branch length#
+# 3) assign internal nodes names                #
+# so that ForwardGenomics can use as input      #
+#################################################
+
 library(ape)
 args = commandArgs(trailingOnly=TRUE)
 t=read.tree(args[1])

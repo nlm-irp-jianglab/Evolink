@@ -1,3 +1,7 @@
+#####################################################################
+# Extract significant gene families from Hogwash synchronous result #
+#####################################################################
+
 args = commandArgs(trailingOnly=TRUE)
 outdir = args[1]
 

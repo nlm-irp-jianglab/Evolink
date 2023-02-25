@@ -3,6 +3,7 @@ suppressMessages({
     library(tidyverse)
     library(phytools)
     library(geiger)
+    library(VGAM)
     library(snow)
     library(foreach)
     library(doParallel)}
@@ -33,7 +34,7 @@ Nsubs = 80 # total number of substitution of characters along the whole tree
 cluster = as.numeric(args[1])
 associate_factor = 15 # control the correlation degree for geno and pheno
 all_ncpus = 72 #
-sim_ncpus = 50 # should be dividable by sim_times
+sim_ncpus = 60 # should be dividable by sim_times
 sim_times = 10000 # the times of simmap phenotype on ancestral nodes
 N_all_geno = 20000
 N_pos_geno = 10
@@ -75,10 +76,6 @@ Q_neg = matrix(c(0,x1,x2,0,
                 4,4,byrow=TRUE)
 rownames(Q_neg)<-colnames(Q_neg)<-c("00","01","10","11")
 diag(Q_neg) <- -rowSums(Q_neg)
-
-print("Pos and Neg Q matrices")
-Q_pos
-Q_neg
 
 # infer a phenotype Q matrix based on correlated Q matrix
 pheno_Q<-matrix(c(0,x1+m2,y1+n2,0),2,2,byrow=TRUE)
@@ -180,52 +177,18 @@ for(k in 1:N_neg_geno){
 pos_geno_df = do.call(rbind, pos_geno)
 neg_geno_df = do.call(rbind, neg_geno)
 asso_geno_df = rbind.data.frame(pos_geno_df, neg_geno_df)
-asso_geno_df
-
-# check correlation in tips
-print("Pos & Neg associated genotype VS phenotype correlation")
-apply(pos_geno_df, 1, cor, y=pheno)
-apply(neg_geno_df, 1, cor, y=pheno)
 
 ### simulate non-associated genotypes ###
-# coverage is sampled from a fitted distribution
+# coverage is sampled from a beta distribution
 N_nonasso = N_all_geno - N_pos_geno - N_neg_geno
-prev_ratio = 0.05 # coverage=0-0.05
-N_prev = round(N_nonasso*prev_ratio)
-N_rare = N_nonasso - N_prev
+set.seed(7)
+coverages = abs(jitter(rbetabinom.ab(N_nonasso, size=Ntips, shape1=0.007, shape2=0.75)))/Ntips
+coverages[coverages >= 1]=1-0.0001
+coverages[coverages < 0.0001]=0.0001
 
-coverages1 = foreach(i=1:N_rare, .combine="c") %dopar% {
-    cov = 0
-    while (TRUE){
-        # cov = rgamma(1, shape=1.5, rate=5)
-        cov = rexp(1, rate=50)
-        if((cov > 0) & (cov <= 1)){
-            break
-        }
-    }
-    cov
-    # coverages = c(coverages, cov)
-}
-
-coverages2 = foreach(i=1:N_prev, .combine="c") %dopar% {
-    cov = 0
-    while (TRUE){
-        # cov = rgamma(1, shape=1.5, rate=5)
-        cov = 1-rexp(1, rate=5)
-        if((cov > 0) & (cov <= 1)){
-            break
-        }
-    }
-    cov
-    # coverages = c(coverages, cov)
-}
-
-coverages = c(coverages1, coverages2)
 length(coverages)
 summary(coverages)
 
-# non_asso_geno_list = list()
-random_assign_N <<- 0
 non_asso_geno <- foreach(i=1:length(coverages), .combine='rbind') %dopar% {
     coverage = coverages[i]
     alpha = coverage*2*(sub_rate+associate_factor*sub_rate) # make it reach equilibrium faster
@@ -234,25 +197,17 @@ non_asso_geno <- foreach(i=1:length(coverages), .combine='rbind') %dopar% {
     geno_Q <-matrix(c(0,alpha,beta,0),2,2,byrow=TRUE)
     rownames(geno_Q)<-colnames(geno_Q)<-c(0,1)
     diag(geno_Q) <- -rowSums(geno_Q)
-
-    g_t <- sim.history(tree,t(geno_Q),message=FALSE)
-    if(sum(g_t$states==1)!=0){
-        non_asso_tip_state = as.numeric(g_t$states)
+    # keep sampling until at least one species has this gene
+    while(TRUE){
+        g_t <- sim.history(tree, t(geno_Q), message=FALSE)
+        if(sum(g_t$states==1)!=0){
+            non_asso_tip_state = as.numeric(g_t$states)
+            break
+        } 
     }
-    else{
-        random_assign_N <<- random_assign_N + 1
-        index = sample(1:length(g_t$states), 1)
-        g_t$states[index] = 1
-        non_asso_tip_state = as.numeric(g_t$states)
-    }
-    names(non_asso_tip_state) = names(g_t$states)
     non_asso_tip_state
 }
-
 rownames(non_asso_geno) = paste0("g", 1:nrow(non_asso_geno))
-corr_res = apply(non_asso_geno, 1, cor, y=pheno)
-print("Non-associated genotype VS phenotype correlation")
-summary(unlist(corr_res))
 
 # dump tree, trait/pheno and geno data
 geno_data = rbind.data.frame(non_asso_geno, pos_geno_df, neg_geno_df) %>% rownames_to_column(var="orthoID")

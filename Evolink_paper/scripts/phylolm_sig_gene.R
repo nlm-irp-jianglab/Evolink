@@ -1,3 +1,7 @@
+#########################################################
+# Extract significant gene families from Phylolm result #
+#########################################################
+
 args = commandArgs(trailingOnly=TRUE)
 infile = args[1]
 outdir = args[2]

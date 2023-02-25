@@ -5,7 +5,11 @@ library(foreach)
 library(doParallel)
 registerDoParallel(56)
 set.seed(1234567)
- 
+
+#####################
+# Call Phylolm in R #
+#####################
+
 option_list = list(
   make_option(c("-n", "--tree"), type="character", default=NULL, 
               help="ultrametric tree file path", metavar="character"),

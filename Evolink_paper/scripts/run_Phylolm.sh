@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#########################################
+# Wrap Phylolm running in a bash script #
+#########################################
+
 source /data/$USER/conda/etc/profile.d/conda.sh
 conda activate bio-env
 

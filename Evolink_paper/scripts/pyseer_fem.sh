@@ -1,5 +1,9 @@
 #!/bin/bash
 
+##########################################################
+# Wrap Pyseer using fixed effects model in a bash script #
+##########################################################
+
 source /data/$USER/conda/etc/profile.d/conda.sh
 conda activate pyseer_env
 

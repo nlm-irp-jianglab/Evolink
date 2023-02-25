@@ -1,3 +1,7 @@
+#################################################################
+# Extract significant gene families from ForwardGenomics result #
+#################################################################
+
 args = commandArgs(trailingOnly=TRUE)
 infile = args[1]
 outdir = args[2]

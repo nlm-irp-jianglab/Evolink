@@ -1,3 +1,7 @@
+##############################################################
+# Extract significant gene families from Hogwash phyC result #
+##############################################################
+
 args = commandArgs(trailingOnly=TRUE)
 outdir = args[1]
 

@@ -251,7 +251,7 @@ We further provide a use case with Flagella data as an example. Click [here](htt
 ## FAQ
 ---
 - Q1: What if my data contains species with multiple samples of genotype data (strains)?  
-- 1) If a species contains multiple strains with similar genotypes and same phenotype, the easiest solution would be to select a representative strain to serve as a genotype representative for that species. 2) If the strains of a species display diverse phenotypes, we would recommended constructing a phylogenetic tree that includes all strains and utilize all available genotype and phenotype information in the analysis. 
+- 1) If a species contains multiple strains with similar genotypes and same phenotype, the easiest solution would be to select a representative strain to serve as a genotype representative for that species. 2) If the strains of a species display diverse phenotypes, we would recommend constructing a phylogenetic tree that includes all strains and utilize all available genotype and phenotype information in the analysis. 
 It should be noted that mGWAS (microbial genome-wide association study) methods (such as [Bugwas](https://github.com/sgearle/bugwas), [Pyseer](https://github.com/mgalardini/pyseer) and [treeWAS](https://github.com/caitiecollins/treeWAS)) are recmmended for multiple samples from closely related species, as they not only consider gene presence and absence but also single nucleotide polymorphisms (SNPs).  
 
 - Q2: What if a genome is assigned with multiple phenotypes?  

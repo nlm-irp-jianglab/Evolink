@@ -1,3 +1,7 @@
+########################################################
+# Extract significant gene families from BUGWAS result #
+########################################################
+
 args = commandArgs(trailingOnly=TRUE)
 outdir = args[1]
 

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+##############################################
+# Wrap Hogwash phyC running in a bash script #
+##############################################
+
 tree_file=$1
 gene_file=$2
 trait_file=$3

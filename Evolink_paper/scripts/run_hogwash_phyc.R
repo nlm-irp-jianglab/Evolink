@@ -2,6 +2,10 @@ library(hogwash)
 library(ape)
 library(tidyverse)
 
+##########################
+# Call Hogwash phyC in R #
+##########################
+
 # Usage: time Rscript --vanilla run_hogwash.R tree.nwk gene.tsv trait.tsv output
 
 args = commandArgs(trailingOnly=TRUE)

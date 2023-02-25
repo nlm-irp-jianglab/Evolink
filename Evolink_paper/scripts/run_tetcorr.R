@@ -8,6 +8,10 @@ registerDoParallel(32)
 set.seed(1234567)
 # Usage: time Rscript --vanilla run_tetcorr.R gene.tsv trait.tsv output
 
+######################################################
+# Wrap Tetrachoric correlation running in a R script #
+######################################################
+
 args = commandArgs(trailingOnly=TRUE)
 
 ### read data ###

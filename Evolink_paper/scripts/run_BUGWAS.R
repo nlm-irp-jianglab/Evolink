@@ -1,3 +1,7 @@
+####################
+# call Bugwas in R #
+####################
+
 library(bugwas)
 args = commandArgs(trailingOnly=TRUE)
 phylo <- args[1]

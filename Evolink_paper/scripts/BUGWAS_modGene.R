@@ -1,6 +1,12 @@
+##############################################
+# Modify gene presence/absence matrix into   #
+# SNP format so that BUGWAS can use as input #
+##############################################
+
 library(tidyverse)
 args = commandArgs(trailingOnly=TRUE)
 
+# remove redundant elements in a list
 uniq_len=function(x){return(length(unique(unlist(x))))}
 
 gene_file = args[1]

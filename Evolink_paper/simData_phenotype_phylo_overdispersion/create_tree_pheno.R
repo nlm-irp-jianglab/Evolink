@@ -28,6 +28,7 @@ while(TRUE){
         saveRDS(tree, paste0(outdir, "/tree.rds"))
         saveRDS(pheno, paste0(outdir, "/pheno.rds"))
     }
+    
     # make sure phenotype prevalence is not very imbalanced
     if(all(pheno_prev_list < 0.6) && all(pheno_prev_list > 0.4)) break
 }

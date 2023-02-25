@@ -1,5 +1,8 @@
 #!/bin/bash
-# ref: https://docs.google.com/document/d/15FHbylHx8_CO6DymaPgDC7KGGsJD3aznKpFIAP5MnoI/edit
+
+#################################################
+# Wrap ForwardGenomics running in a bash script #
+#################################################
 
 source /data/$USER/conda/etc/profile.d/conda.sh
 conda activate bio-env
