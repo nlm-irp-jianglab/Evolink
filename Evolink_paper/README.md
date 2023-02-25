@@ -6,11 +6,11 @@ This a pipeline for generating simulated data and runing Evolink and alternative
 `git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
 `cd Evolink/Evolink_paper`  
 
-2. install conda env
+2. install conda env  
 `conda env create -f env_yml/bio-env.yml`  
 `conda env create -f env_yml/pyseer_env.yml`  
 
-3. install R packages
+3. install R packages  
 `conda activate bio-env`  
 Type `R` and enter R terminal:  
 `install.packages(c("tidyverse", "phytools", "geiger", "snow", "VGAM", "foreach", "doParallel"))`  
