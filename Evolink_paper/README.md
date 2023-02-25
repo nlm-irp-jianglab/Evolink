@@ -2,18 +2,18 @@
 This a pipeline for generating simulated data and runing Evolink and alternative methods on both similated data and empirical data.
 
 ## Install environment
-1. git clone project
+1. git clone project  
 `git clone https://github.com/nlm-irp-jianglab/Evolink.git`  
-`cd Evolink/Evolink_paper`
+`cd Evolink/Evolink_paper`  
 
 2. install conda env
-`conda env create -f env_yml/bio-env.yml`
-`conda env create -f env_yml/pyseer_env.yml`
+`conda env create -f env_yml/bio-env.yml`  
+`conda env create -f env_yml/pyseer_env.yml`  
 
 3. install R packages
-`conda activate bio-env`
-Type `R` and enter R terminal:
-`install.packages(c("tidyverse", "phytools", "geiger", "snow", "VGAM", "foreach", "doParallel"))`
+`conda activate bio-env`  
+Type `R` and enter R terminal:  
+`install.packages(c("tidyverse", "phytools", "geiger", "snow", "VGAM", "foreach", "doParallel"))`  
 
 Note: We highly recommend users who want to follow this protocol run scripts on an HPC (high performance cluster) node with the [Slurm Workload Manager](https://slurm.schedmd.com/overview.html) on Linux system. Because the memory needed to generate simulated data will exceed 600 GB with a maximal memery of 1500 GB, considering that most of the simulated datasets have >= 1000 species and >= 20K genes.
 
