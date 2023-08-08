@@ -16,6 +16,23 @@ import statsmodels.stats.multitest as smm
 script_dir = os.path.abspath(os.path.dirname( __file__ ))
 
 def Evolink_calculation(gene_matrix, trait_matrix, species_list, gene_list, tree_file):
+    """
+    Calculate Evolink indices for a gene matrix
+
+    :gene_matrix: A description of the first argument.
+    :type gene_matrix: The data type of the first argument.
+    :trait_matrix: A description of the second argument.
+    :type arg2: The data type of the second argument.
+    :species_list: Additional arguments (if any).
+    :type: Data types of additional arguments (if any).
+    :gene_list: A description of the second argument.
+    :type: The data type of the second argument.
+    :tree_file: A description of the second argument.
+    :type: The data type of the second argument.
+    :return: A description of what the function returns.
+    :rtype: The data type of the return value.
+    """
+
     import warnings
     warnings.simplefilter(action='ignore', category=RuntimeWarning)
 
@@ -52,11 +69,13 @@ def Evolink_calculation(gene_matrix, trait_matrix, species_list, gene_list, tree
     return df
 
 def matrix2hdf5(matrix, row_names, col_names, outfile):
+    """ Convert a matrix into hdf5 file """
     tab = Table(matrix, row_names, col_names)
     with biom_open(outfile, 'w') as f:
         tab.to_hdf5(f, "Evolink")
 
 def matrix_faith_pd(matrix, species_name, gene_list, tree_path):
+    """ Calculate faith phylogenetic diversity """
     fd, path = tempfile.mkstemp(suffix=".biom")
     matrix2hdf5(matrix, species_name, gene_list, path)
     obs = faith_pd(path, tree_path)
@@ -67,6 +86,11 @@ def matrix_faith_pd(matrix, species_name, gene_list, tree_path):
     return (obs, path)
 
 def generate_four_matrix(gene_matrix, trait_matrix):
+    """
+    Convert gene mattrix and trait matrix to get G1T1 (gene presence, trait presence),
+    G0T1 (gene absence, trait presence), G1T0 (gene presence, trait absence),
+    G0T0 (gene absence, trait absence) matrices.
+    """
     T1_index = np.where(trait_matrix == [1])[0]
     T0_index = np.where(trait_matrix == [0])[0]
     G1T1 = np.multiply(gene_matrix, np.transpose(trait_matrix)).T[T1_index]

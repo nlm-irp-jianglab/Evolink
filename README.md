@@ -39,14 +39,13 @@
 - `test_data/`: A folder containing a bash script `test.sh` and related data for testing.
 - `Evolink_paper/`: A folder containing additional data used in the Evolink paper along with scripts to compare Evolink to other methods on simulated and empirical datasets. See details in `Evolink_paper/README.md`.
 
-
 # Document
 
 Documentation detailing the installation, Evolink input and Evolink output is provided here: [Evolink document](https://nlm-irp-jianglab.github.io/Evolink).
 
 # Flagellar dataset example
 
-A use case showing how to apply Evolink to a real-world flagella-related dataset is provided here: [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md).
+A use case showing how to apply Evolink to a real-world flagella-related dataset is provided here: [Flagella use case](https://github.com/nlm-irp-jianglab/Evolink/blob/main/flagella_data/Records.md). The genome, gff annotation and emapper annotation files are provided at 
 
 # Gram-staining dataset example
 
@@ -54,7 +53,9 @@ A use case showing users how to apply Evolink to a real-world gram-staining data
 
 # Other resources
 
-We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make it easier to run and access Evolink on different platforms.
+- We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make it easier to run and access Evolink on different platforms.  
+
+- The genome, gff annotation and emapper annotation files for Flagellar and Gram-staining datasets are provided at `https://ftp.ncbi.nlm.nih.gov/pub/mgx/WOL_flagellum_data.tar.gz` and `https://ftp.ncbi.nlm.nih.gov/pub/mgx/WOL_gram_staining_data.tar.gz`, respectively.
 
 # Acknowledgements
 
@@ -64,4 +65,4 @@ We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and 
 - [treeWAS](https://github.com/caitiecollins/treeWAS) R package
 
 # Citation
-To be added
+Yiyan Yang , Xiaofang Jiang, Evolink: a phylogenetic approach for rapid identification of genotype–phenotype associations in large-scale microbial multispecies data, Bioinformatics, Volume 39, Issue 5, May 2023, btad215, https://doi.org/10.1093/bioinformatics/btad215
