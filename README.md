@@ -55,7 +55,7 @@ A use case showing users how to apply Evolink to a real-world gram-staining data
 
 - We also provide a [docker](https://hub.docker.com/r/nlmirpjianglab/evolink) and a [web portal](https://jianglabnlm.com/evolink) to make it easier to run and access Evolink on different platforms.  
 
-- The genome, gff annotation and emapper annotation files for Flagellar and Gram-staining datasets are provided at `https://ftp.ncbi.nlm.nih.gov/pub/mgx/WOL_flagellum_data.tar.gz` and `https://ftp.ncbi.nlm.nih.gov/pub/mgx/WOL_gram_staining_data.tar.gz`, respectively.
+- The genome, gff annotation and emapper annotation files for Flagellar and Gram-staining datasets are provided at [WOL_flagellum_data.tar.gz](https://ftp.ncbi.nlm.nih.gov/pub/mgx/WOL_flagellum_data.tar.gz) and [WOL_gram_staining_data.tar.gz](https://ftp.ncbi.nlm.nih.gov/pub/mgx/WOL_gram_staining_data.tar.gz), respectively.
 
 # Acknowledgements
 
